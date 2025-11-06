@@ -143,32 +143,51 @@ private extension WhatsNewView {
     func feature(
         _ feature: WhatsNew.Feature
     ) -> some View {
-        HStack(
-            alignment: self.layout.featureHorizontalAlignment,
-            spacing: self.layout.featureHorizontalSpacing
-        ) {
-            feature
-                .image
-                .view()
-                .frame(width: self.layout.featureImageWidth)
-            VStack(
-                alignment: .leading,
-                spacing: self.layout.featureVerticalSpacing
-            ) {
-                Text(
-                    whatsNewText: feature.title
-                )
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(.primary)
-                .fixedSize(horizontal: false, vertical: true)
-                Text(
-                    whatsNewText: feature.subtitle
-                )
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+        VStack {
+            if let feature = feature.feature {
+                HStack(
+                    alignment: self.layout.featureHorizontalAlignment,
+                    spacing: self.layout.featureHorizontalSpacing
+                ) {
+                    feature
+                        .image
+                        .view()
+                        .frame(width: self.layout.featureImageWidth)
+                    VStack(
+                        alignment: .leading,
+                        spacing: self.layout.featureVerticalSpacing
+                    ) {
+                        Text(
+                            whatsNewText: feature.title
+                        )
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        Text(
+                            whatsNewText: feature.subtitle
+                        )
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .multilineTextAlignment(.leading)
+                }
+            } else if let customViewBuilder = feature.customViewBuilder {
+                if feature.useDefaultStyling {
+                    customViewBuilder()
+                        .buttonStyle(PrimaryButtonStyle(
+                            primaryAction: self.whatsNew.primaryAction,
+                            layout: self.layout
+                        ))
+                        .multilineTextAlignment(.leading)
+                } else {
+                    customViewBuilder()
+                }
+            } else {
+                VStack {
+                    Text("Custom view here")
+                }
             }
-            .multilineTextAlignment(.leading)
         }.accessibilityElement(children: .combine)
     }
     

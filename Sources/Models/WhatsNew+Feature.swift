@@ -9,14 +9,13 @@ public extension WhatsNew {
         
         // MARK: Properties
         
-        /// The image
-        public var image: Image
+        /// The default feature
+        var feature: Default?
         
-        /// The title Text
-        public var title: Text
+        /// For custom SwiftUI views
+        let customViewBuilder: (() -> AnyView)?
         
-        /// The subtitle Text
-        public var subtitle: Text
+        var useDefaultStyling: Bool = true
         
         // MARK: Initializer
         
@@ -30,15 +29,49 @@ public extension WhatsNew {
             title: Text,
             subtitle: Text
         ) {
-            self.image = image
-            self.title = title
-            self.subtitle = subtitle
+            self.feature = Default(image: image, title: title, subtitle: subtitle)
+            self.customViewBuilder = nil
         }
         
+        public init<Content: View>(
+            @ViewBuilder customView: @escaping () -> Content,
+            useDefaultStyling: Bool = true
+        ) {
+            self.feature = nil
+            self.customViewBuilder = { AnyView(customView()) }
+            self.useDefaultStyling = useDefaultStyling
+        }
     }
     
 }
 
+extension WhatsNew.Feature {
+    
+    /// Representing a default `Feature`
+    struct Default {
+        // MARK: Properties
+        
+        /// The image
+        public var image: Image
+        
+        /// The title Text
+        public var title: WhatsNew.Text
+        
+        /// The subtitle Text
+        public var subtitle: WhatsNew.Text
+        
+        public init(
+            image: Image,
+            title: WhatsNew.Text,
+            subtitle: WhatsNew.Text
+        ) {
+            self.image = image
+            self.title = title
+            self.subtitle = subtitle
+        }
+    }
+    
+}
 // MARK: - Feature+Equatable
 
 extension WhatsNew.Feature: Equatable {
@@ -51,8 +84,12 @@ extension WhatsNew.Feature: Equatable {
         lhs: Self,
         rhs: Self
     ) -> Bool {
-        lhs.title == rhs.title
-            && lhs.subtitle == rhs.subtitle
+        if let lhs = lhs.feature, let rhs = rhs.feature {
+            return lhs.title == rhs.title
+                && lhs.subtitle == rhs.subtitle
+        } else {
+            return false
+        }
     }
     
 }
@@ -66,8 +103,12 @@ extension WhatsNew.Feature: Hashable {
     public func hash(
         into hasher: inout Hasher
     ) {
-        hasher.combine(self.title)
-        hasher.combine(self.subtitle)
+        if let d = self.feature {
+            hasher.combine(d.title)
+            hasher.combine(d.subtitle)
+        } else {
+            
+        }
     }
     
 }
