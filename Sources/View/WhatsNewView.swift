@@ -145,6 +145,7 @@ private extension WhatsNewView {
     ) -> some View {
         VStack {
             if let feature = feature.feature {
+                /// If the `Feature` is using `Default` present the default view style
                 HStack(
                     alignment: self.layout.featureHorizontalAlignment,
                     spacing: self.layout.featureHorizontalSpacing
@@ -173,6 +174,7 @@ private extension WhatsNewView {
                     .multilineTextAlignment(.leading)
                 }
             } else if let customViewBuilder = feature.customViewBuilder {
+                /// Present a custom view
                 if feature.useDefaultStyling {
                     customViewBuilder()
                         .buttonStyle(PrimaryButtonStyle(
@@ -184,9 +186,11 @@ private extension WhatsNewView {
                     customViewBuilder()
                 }
             } else {
-                VStack {
-                    Text("Custom view here")
-                }
+                /// If there is no feature or custom view
+                Text("Error, something went wrong")
+                    .onAppear {
+                        print("There was nether a feature, nor a custom view, so this view could not be rendered")
+                    }
             }
         }.accessibilityElement(children: .combine)
     }

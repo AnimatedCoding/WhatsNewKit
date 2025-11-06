@@ -115,6 +115,14 @@ struct ContentView: View {
                 title: "Showcase your new App Features",
                 subtitle: "Present your new app features..."
             ),
+            .init(customView: {
+                Button(action: {
+                    print("Pressed")
+                }) {
+                    Text("This is a custom view")
+                }
+                //Any other SwiftUI component
+            })
             // ...
         ]
     )
@@ -388,6 +396,17 @@ let feature = WhatsNew.Feature(
             markdown: "An awesome new _Design_"
         )
     )
+)
+```
+
+But can also have a custom view.
+
+```swift
+let feature = WhatsNew.Feature(
+    customView: {
+        Text("Some SwiftUI view")
+    },
+    useDefaultStyling: true // Style buttons like the `PrimaryAction` button, `false` to use custom style
 )
 ```
 

@@ -17,9 +17,9 @@ public extension WhatsNew {
         
         var useDefaultStyling: Bool = true
         
-        // MARK: Initializer
+        // MARK: Initializers
         
-        /// Creates a new instance of `WhatsNew.Feature`
+        /// Creates a new instance of `WhatsNew.Feature` using the `Default` method
         /// - Parameters:
         ///   - image: The image
         ///   - title: The title Text
@@ -33,6 +33,10 @@ public extension WhatsNew {
             self.customViewBuilder = nil
         }
         
+        /// Creates a new instance of `WhatsNew.Feature` in custom view mode
+        ///  - Parameters:
+        ///   - customView: The SwiftUI view that should be presented
+        ///   - useDefaultStyling: This sets the button style to be the same as the main action button, it defaults to `true`
         public init<Content: View>(
             @ViewBuilder customView: @escaping () -> Content,
             useDefaultStyling: Bool = true
@@ -47,7 +51,7 @@ public extension WhatsNew {
 
 extension WhatsNew.Feature {
     
-    /// Representing a default `Feature`
+    /// Representing a default `Feature` (`WhatsNew.Feature.Default`)``
     struct Default {
         // MARK: Properties
         
@@ -60,6 +64,11 @@ extension WhatsNew.Feature {
         /// The subtitle Text
         public var subtitle: WhatsNew.Text
         
+        /// Creates a new instance of `WhatsNew.Feature.Default`
+        /// - Parameters:
+        ///   - image: The image
+        ///   - title: The title Text
+        ///   - subtitle: The subtitle Text
         public init(
             image: Image,
             title: WhatsNew.Text,
