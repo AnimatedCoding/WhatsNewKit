@@ -26,6 +26,31 @@ public extension View {
         )
     }
     
+    /// Presents a WhatsNewView using the given WhatsNew object as a data source for the sheet’s content.
+    /// - Parameters:
+    ///   - whatsNew: A Binding to an optional WhatsNew object
+    ///   - versionStore: The optional WhatsNewVersionStore. Default value `nil`
+    ///   - layout: The WhatsNew Layout. Default value `.default`
+    ///   - onDismiss: The closure to execute when dismissing the sheet. Default value `nil`
+    ///   - isPresented: The `Bool` for if the sheet is presented
+    func sheet(
+        whatsNew: Binding<WhatsNew?>,
+        versionStore: WhatsNewVersionStore? = nil,
+        layout: WhatsNew.Layout = .default,
+        onDismiss: (() -> Void)? = nil,
+        isPresented: Binding<Bool>
+    ) -> some View {
+        self.modifier(
+            ManualWhatsNewSheetViewModifierWithDismisser(
+                whatsNew: whatsNew,
+                versionStore: versionStore,
+                layout: layout,
+                onDismiss: onDismiss,
+                isPresented: isPresented
+            )
+        )
+    }
+    
 }
 
 // MARK: - ManualWhatsNewSheetViewModifier
@@ -72,6 +97,55 @@ private struct ManualWhatsNewSheetViewModifier: ViewModifier {
                         layout: self.layout
                     )
                 }
+            }
+        } else {
+            // Otherwise show content
+            content
+        }
+    }
+    
+}
+
+// MARK: - ManualWhatsNewSheetViewModifierWithDismisser
+
+private struct ManualWhatsNewSheetViewModifierWithDismisser: ViewModifier {
+    
+    // MARK: Properties
+    
+    /// A Binding to an optional WhatsNew object
+    let whatsNew: Binding<WhatsNew?>
+    
+    /// The optional WhatsNewVersionStore
+    let versionStore: WhatsNewVersionStore?
+    
+    /// The WhatsNew Layout
+    let layout: WhatsNew.Layout
+    
+    /// The closure to execute when dismissing the sheet
+    let onDismiss: (() -> Void)?
+    
+    /// A Binding to the Bool for presenting
+    var isPresented: Binding<Bool>
+    
+    // MARK: ViewModifier
+    
+    /// Gets the current body of the caller.
+    /// - Parameter content: The Content
+    func body(
+        content: Content
+    ) -> some View {
+        // Check if a WhatsNew object is available
+        if let whatsNew = self.whatsNew.wrappedValue {
+            // This sheet doesn't check if the version has been presented, because it is the one for use with custom isPresented
+            // Show WhatsNew Sheet
+            content
+                .sheet(isPresented: isPresented, onDismiss: self.onDismiss)
+            {
+                WhatsNewView(
+                    whatsNew: whatsNew,
+                    versionStore: self.versionStore,
+                    layout: self.layout
+                )
             }
         } else {
             // Otherwise show content

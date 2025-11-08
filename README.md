@@ -62,6 +62,11 @@ struct ContentView: View {
 - [x] Runs on iOS, macOS and visionOS 📱 🖥 👓
 - [x] Adjustable layout 🔧
 
+## Compatibility
+
+The package works with iOS 13+, macOS 11+ and visionOS v1. Some features only work on newer versions. Also, not all features have been tested on all versions.
+This package has not been tested on iOS 26 or macOS 26, but soon will be.
+
 ## Installation
 
 ### Swift Package Manager
@@ -75,6 +80,8 @@ dependencies: [
 ```
 
 Or navigate to your Xcode project then select `Swift Packages`, click the “+” icon and search for `WhatsNewKit`.
+
+The package uses the [Equatable Macro](https://github.com/ordo-one/equatable), so Xcode will ask if you are OK with that macro
 
 ## Example
 
@@ -138,6 +145,8 @@ struct ContentView: View {
 
 }
 ```
+
+The modifier has another init with `sheet(whatsNew: , isPresented: Binding<Bool>)` for presise control of sheet presentation
 
 ### Automatic Presentation
 
@@ -205,6 +214,23 @@ extension App: WhatsNewCollectionProvider {
     }
 
 }
+```
+
+## Feature View
+
+Display a feature not in the onboarding sheet using feature view in SwiftUI
+
+```swift
+FeatureView(feature:
+    .init(
+        image: .init(
+            systemName: "star.fill",
+            foregroundColor: .orange
+        ),
+        title: "Showcase your new App Features",
+        subtitle: "Present your new app features..."
+    )
+)
 ```
 
 ## WhatsNewEnvironment
@@ -410,6 +436,39 @@ let feature = WhatsNew.Feature(
 )
 ```
 
+### WhatsNew.FeatureGroup
+
+Display multiple pages in onboarding using FeatureGroup
+```swift
+let feature = WhatsNew(
+                title: "WhatsNewKit",
+                featuresGroups: [
+                    .init(feature: [
+                        .init(
+                            image: .init(
+                                systemName: "star.fill",
+                                foregroundColor: .orange
+                            ),
+                            title: "Showcase your new App Features1",
+                            subtitle: "Present your new app features...1"
+                        ),
+                    ]),
+                    .init(feature: [
+                        .init(customView: {
+                            Button(action: {
+                                print("Pressed2")
+                            }) {
+                                Text("This is a custom view2")
+                            }
+                        }),
+                    ],
+                        action: .init(title: "Close", backgroundColor: .red, action: dismiss)
+                    )
+                ],
+            )
+        }
+```
+
 ### WhatsNew.PrimaryAction
 
 The `WhatsNew.PrimaryAction` allows you to configure the behaviour of the primary button which is used to dismiss the presented `WhatsNewView`
@@ -420,11 +479,13 @@ let primaryAction = WhatsNew.PrimaryAction(
     backgroundColor: .blue,
     foregroundColor: .white,
     hapticFeedback: .notification(.success),
-    onDismiss: {
-        print("WhatsNewView has been dismissed")
+    action: { progress, dismiss in
+            progress()
     }
 )
 ```
+
+The action accept two `() -> Void` closers, the first progresses to the next Feature Group, or dismisses if it is the last group or a view initializes without groups (one group). The second cloeses the sheet.
 
 > Note: HapticFeedback will only be executed on iOS
 

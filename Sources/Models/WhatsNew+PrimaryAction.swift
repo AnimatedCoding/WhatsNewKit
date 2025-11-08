@@ -22,7 +22,7 @@ public extension WhatsNew {
         public var hapticFeedback: HapticFeedback?
         
         /// The optional on dismiss closure
-        public var onDismiss: (() -> Void)?
+        public var action: ((() -> Void, () -> Void) -> Void)?
         
         // MARK: Initializer
         
@@ -38,13 +38,13 @@ public extension WhatsNew {
             backgroundColor: Color = .accentColor,
             foregroundColor: Color = .white,
             hapticFeedback: HapticFeedback? = nil,
-            onDismiss: (() -> Void)? = nil
+            action: ((() -> Void, () -> Void) -> Void)? = FeatureGroup.defaultAction
         ) {
             self.title = title
             self.backgroundColor = backgroundColor
             self.foregroundColor = foregroundColor
             self.hapticFeedback = hapticFeedback
-            self.onDismiss = onDismiss
+            self.action = action
         }
         
     }

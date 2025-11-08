@@ -52,7 +52,7 @@ public extension WhatsNew {
 extension WhatsNew.Feature {
     
     /// Representing a default `Feature` (`WhatsNew.Feature.Default`)``
-    struct Default {
+    public struct Default {
         // MARK: Properties
         
         /// The image

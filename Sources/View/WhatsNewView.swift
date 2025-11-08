@@ -7,8 +7,11 @@ public struct WhatsNewView {
     
     // MARK: Properties
     
+    
+    /// The current `FeatureGroup`
+    @State public var groupIndex: Int? = nil
     /// The WhatsNew object
-    private let whatsNew: WhatsNew
+    @State private var whatsNew: WhatsNew
     
     /// The WhatsNewVersionStore
     private let whatsNewVersionStore: WhatsNewVersionStore?
@@ -40,7 +43,7 @@ public struct WhatsNewView {
         self.whatsNewVersionStore = versionStore
         self.layout = layout
     }
-    
+    /// Sets the `WhatsNew.selectedFeature` to the first in `WhatsNew.featureGroups`
 }
 
 // MARK: - View
@@ -61,6 +64,8 @@ extension WhatsNewView: View {
                 ) {
                     // Title
                     self.title
+                        .transition(.slide)
+                        .frame(maxWidth: .infinity)
                     // Feature List
                     VStack(
                         alignment: .leading,
@@ -68,7 +73,7 @@ extension WhatsNewView: View {
                     ) {
                         // Feature
                         ForEach(
-                            self.whatsNew.features,
+                            self.whatsNew.selectedFeature?.features ?? [],
                             id: \.self,
                             content: self.feature
                         )
@@ -85,24 +90,46 @@ extension WhatsNewView: View {
                         self.layout.scrollViewBottomContentInset
                     )
             }
-            #if os(iOS)
+#if os(iOS)
             .alwaysBounceVertical(false)
-            #endif
+#endif
             // Footer
-            VStack {
-                Spacer()
-                self.footer
+            if #available(iOS 15, macOS 12, *) {
+                VStack {
+                    VStack {
+                        self.footer
+                    }
                     .modifier(FooterPadding())
-                    #if os(iOS)
+#if os(iOS)
                     .background(
                         UIVisualEffectView
                             .Representable()
                             .edgesIgnoringSafeArea(.horizontal)
                             .padding(self.layout.footerVisualEffectViewPadding)
                     )
-                    #endif
+#endif
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top)
+                .background {
+#if os(macOS)
+                    Color(nsColor: NSColor.windowBackgroundColor)
+#else
+                    Color(uiColor: UIColor.systemBackground)
+#endif
+                }
+                .edgesIgnoringSafeArea(.bottom)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+            } else {
+                VStack {
+                    Spacer()
+                    VStack {
+                        self.footer
+                    }
+                    .modifier(FooterPadding())
+                }
+                .edgesIgnoringSafeArea(.bottom)
             }
-            .edgesIgnoringSafeArea(.bottom)
         }
         .sheet(
             item: self.$secondaryActionPresentedView,
@@ -114,8 +141,12 @@ extension WhatsNewView: View {
                 presentedVersion: self.whatsNew.version
             )
         }
+        .onAppear {
+            if let i = whatsNew.selectedFeature {
+                groupIndex = 0
+            }
+        }
     }
-    
 }
 
 // MARK: - Title
@@ -175,10 +206,10 @@ private extension WhatsNewView {
                 }
             } else if let customViewBuilder = feature.customViewBuilder {
                 /// Present a custom view
-                if feature.useDefaultStyling {
+                if feature.useDefaultStyling, let groupIndex {
                     customViewBuilder()
                         .buttonStyle(PrimaryButtonStyle(
-                            primaryAction: self.whatsNew.primaryAction,
+                            primaryAction: whatsNew.featureGroups[groupIndex].primaryAction,
                             layout: self.layout
                         ))
                         .multilineTextAlignment(.leading)
@@ -187,14 +218,72 @@ private extension WhatsNewView {
                 }
             } else {
                 /// If there is no feature or custom view
-                Text("Error, something went wrong")
-                    .onAppear {
-                        print("There was nether a feature, nor a custom view, so this view could not be rendered")
+                VStack {
+                    if #available(iOS 17.0, macOS 14.0, *) {
+                        ContentUnavailableView("Error, there was no onboarding view", image: "exclamationmark.triangle.text.page.fill",
+                                               description: Text("Contact the developer if this error persists"))
+                    } else {
+                        if #available(iOS 14.0, *) {
+                            Label("Error, there was no onboarding view", systemImage: "exclamationmark.triangle.text.page.fill")
+                        } else {
+                            HStack {
+                                Text("Error, there was no onboarding view")
+                                Image(systemName: "exclamationmark.triangle.text.page.fill")
+                            }
+                        }
+                        Text("Contact the developer if this error persists")
                     }
+                }
+                .onAppear {
+                    print("There was nether a feature, nor a custom view, so this view could not be rendered")
+                }
             }
-        }.accessibilityElement(children: .combine)
+        }
+        .accessibilityElement(children: .combine)
+        /*.transition(.asymmetric(
+            insertion: .move(edge: .trailing), // Enters from the right
+            removal: .move(edge: .leading)    // Exits towards the left
+        ))*/
+        .transition(.slideHorizontally)
+        .frame(maxWidth: .infinity)
     }
     
+}
+
+/// Used for custom slide transition
+extension AnyTransition {
+    static var slideHorizontally: AnyTransition {
+#if os(macOS)
+        .asymmetric(
+            insertion: .modifier(
+                active: OffsetModifier(x: NSScreen.main?.frame.width ?? 0),
+                identity: OffsetModifier(x: 0)
+            ),
+            removal: .modifier(
+                active: OffsetModifier(x: -(NSScreen.main?.frame.width ?? 0)),
+                identity: OffsetModifier(x: 0)
+            )
+        )
+#else
+        .asymmetric(
+            insertion: .modifier(
+                active: OffsetModifier(x: UIScreen.main.bounds.width),
+                identity: OffsetModifier(x: 0)
+            ),
+            removal: .modifier(
+                active: OffsetModifier(x: -UIScreen.main.bounds.width),
+                identity: OffsetModifier(x: 0)
+            )
+        )
+#endif
+    }
+}
+
+struct OffsetModifier: ViewModifier {
+    let x: CGFloat
+    func body(content: Content) -> some View {
+        content.offset(x: x)
+    }
 }
 
 // MARK: - Footer
@@ -207,7 +296,7 @@ private extension WhatsNewView {
             spacing: self.layout.footerActionSpacing
         ) {
             // Check if a secondary action is available
-            if let secondaryAction = self.whatsNew.secondaryAction {
+            if let secondaryAction = self.whatsNew.selectedFeature?.secondaryAction {
                 // Secondary Action Button
                 Button(
                     action: {
@@ -228,38 +317,70 @@ private extension WhatsNewView {
                         whatsNewText: secondaryAction.title
                     )
                 }
-                #if os(macOS)
+#if os(macOS)
                 .buttonStyle(
                     PlainButtonStyle()
                 )
-                #endif
+#endif
                 .foregroundColor(secondaryAction.foregroundColor)
             }
             // Primary Action Button
-            Button(
-                action: {
-                    // Invoke HapticFeedback, if available
-                    self.whatsNew.primaryAction.hapticFeedback?()
-                    // Dismiss
-                    self.presentationMode.wrappedValue.dismiss()
-                    // Invoke on dismiss, if available
-                    self.whatsNew.primaryAction.onDismiss?()
+            if let primaryAction = self.whatsNew.selectedFeature?.primaryAction {
+                Button(
+                    action: {
+                        // Invoke HapticFeedback, if available
+                        primaryAction.hapticFeedback
+                        // Invoke on dismiss, if available
+                        primaryAction.action?(moveToNext, dismiss)
+                    }
+                ) {
+                    Text(
+                        whatsNewText:primaryAction.title
+                    )
                 }
-            ) {
-                Text(
-                    whatsNewText: self.whatsNew.primaryAction.title
+                .buttonStyle(
+                    PrimaryButtonStyle(
+                        primaryAction: primaryAction,
+                        layout: self.layout
+                    )
                 )
+#if os(macOS)
+                .keyboardShortcut(.defaultAction)
+#endif
+            } else {
+                Button(action: {}) {
+                    Text("Loading")
+                }
+                .buttonStyle(
+                    PrimaryButtonStyle(
+                        primaryAction: WhatsNew.PrimaryAction(),
+                        layout: self.layout
+                    )
+                )
+#if os(macOS)
+                .keyboardShortcut(.defaultAction)
+#endif
             }
-            .buttonStyle(
-                PrimaryButtonStyle(
-                    primaryAction: self.whatsNew.primaryAction,
-                    layout: self.layout
-                )
-            )
-            #if os(macOS)
-            .keyboardShortcut(.defaultAction)
-            #endif
         }
     }
-    
+    func moveToNext() {
+        withAnimation {
+            if var groupIndex = groupIndex {
+                groupIndex += 1
+                if groupIndex < whatsNew.featureGroups.count {
+                    let newSelect = whatsNew.featureGroups[groupIndex]
+                    whatsNew.selectedFeature = newSelect
+                } else {
+                    dismiss()
+                }
+            } else {
+                groupIndex = 0
+            }
+        }
+    }
+    func dismiss() {
+        withAnimation {
+            self.presentationMode.wrappedValue.dismiss()
+        }
+    }
 }

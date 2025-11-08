@@ -17,9 +17,11 @@ let package = Package(
             ]
         )
     ],
+    dependencies: [],
     targets: [
         .target(
             name: "WhatsNewKit",
+            dependencies: [],
             path: "Sources",
             resources: [
                 .process("Resources/PrivacyInfo.xcprivacy")

@@ -14,21 +14,18 @@ public struct WhatsNew {
     public var title: Title
     
     /// The Features
-    public var features: [Feature]
+    public var featureGroups: [FeatureGroup]
     
-    /// The PrimaryAction
-    public var primaryAction: PrimaryAction
-    
-    /// The optional SecondaryAction
-    public var secondaryAction: SecondaryAction?
+    /// The selected `FeatureGroup`
+    public var selectedFeature: WhatsNew.FeatureGroup?
     
     // MARK: Initializer
     
-    /// Creates a new instance of `WhatsNew`
+    /// Creates a new instance of `WhatsNew` using `Feature`
     /// - Parameters:
     ///   - version: The Version. Default value `.current()`
     ///   - title: The Title
-    ///   - items: The Features
+    ///   - features: The Features
     ///   - primaryAction: The PrimaryAction. Default value `.init()`
     ///   - secondaryAction: The optional SecondaryAction. Default value `nil`
     public init(
@@ -40,11 +37,28 @@ public struct WhatsNew {
     ) {
         self.version = version
         self.title = title
-        self.features = features
-        self.primaryAction = primaryAction
-        self.secondaryAction = secondaryAction
+        self.featureGroups = [FeatureGroup(feature: features, action: primaryAction, secondaryAction: secondaryAction)]
+        if !featureGroups.isEmpty {
+            self.selectedFeature = featureGroups[0]
+        }
     }
-    
+    /// Creates a new instance of `WhatsNew` using `FeatureGroup`
+    /// - Parameters:
+    ///   - version: The Version. Default value `.current()`
+    ///   - title: The Title
+    ///   - featuresGroups: The FeaturesGroups
+    public init(
+        version: Version = .current(),
+        title: Title,
+        featuresGroups: [FeatureGroup],
+    ) {
+        self.version = version
+        self.title = title
+        self.featureGroups = featuresGroups
+        if !featureGroups.isEmpty {
+            self.selectedFeature = featureGroups[0]
+        }
+    }
 }
 
 // MARK: - Identifiable
