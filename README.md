@@ -65,7 +65,7 @@ struct ContentView: View {
 ## Compatibility
 
 The package works with iOS 13+, macOS 11+ and visionOS v1. Some features only work on newer versions. Also, not all features have been tested on all versions.
-This package has not been tested on iOS 26 or macOS 26, but soon will be.
+This package has not been tested on iOS 26 or macOS 26, but it soon will be.
 
 ## Installation
 
@@ -80,8 +80,6 @@ dependencies: [
 ```
 
 Or navigate to your Xcode project then select `Swift Packages`, click the “+” icon and search for `WhatsNewKit`.
-
-The package uses the [Equatable Macro](https://github.com/ordo-one/equatable), so Xcode will ask if you are OK with that macro
 
 ## Example
 
@@ -128,7 +126,7 @@ struct ContentView: View {
                 }) {
                     Text("This is a custom view")
                 }
-                //Any other SwiftUI component
+                // Any other SwiftUI component
             })
             // ...
         ]
@@ -146,11 +144,11 @@ struct ContentView: View {
 }
 ```
 
-The modifier has another init with `sheet(whatsNew: , isPresented: Binding<Bool>)` for presise control of sheet presentation
+The modifier has another init with `sheet(whatsNew: , isPresented: Binding<Bool>)` for precise control of sheet presentation
 
 ### Automatic Presentation
 
-The automatic presentation mode allows you to simply declare your new features via the SwiftUI Environment and WhatsNewKit will take care to present the corresponding `WhatsNewView`.
+The automatic presentation mode allows you to simply declare your new features via the SwiftUI Environment and WhatsNewKit will take care of presenting the corresponding `WhatsNewView`.
 
 First add a `.whatsNewSheet()` modifier to the view where the `WhatsNewView` should be presented on.
 
@@ -267,7 +265,7 @@ let whatsNewEnvironment = WhatsNewEnvironment(
 
 Additionally, the `WhatsNewEnvironment` includes a fallback for patch versions. For example when a user installs version `1.0.1` and you only have declared a `WhatsNew` for version `1.0.0` the environment will automatically fallback to version `1.0.0` and present the `WhatsNewView` to the user if needed.
 
-If you wish to further customize the behaviour of the `WhatsNewEnvironment` you can easily subclass it and override the `whatsNew()` function.
+If you wish to further customize the behavior of the `WhatsNewEnvironment` you can easily subclass it and override the `whatsNew()` function.
 
 ```swift
 class MyCustomWhatsNewEnvironment: WhatsNewEnvironment {
@@ -328,7 +326,7 @@ If you are making use of the `NSUbiquitousKeyValueWhatsNewVersionStore` please e
 
 ## WhatsNew
 
-The following sections explains how a `WhatsNew` struct can be initialized in order to describe the new features for a given version of your app.
+The following section explains how a `WhatsNew` struct can be initialized in order to describe the new features for a given version of your app.
 
 ```swift
 let whatsnew = WhatsNew(
@@ -409,7 +407,7 @@ let title = WhatsNew.Title(
 
 ### WhatsNew.Feature
 
-A `WhatsNew.Feature` describe a specific feature of your app and generally consist of an image, title, and subtitle.
+A `WhatsNew.Feature` describes a specific feature of your app and generally consist of an image, title, and subtitle.
 
 ```swift
 let feature = WhatsNew.Feature(
@@ -438,7 +436,7 @@ let feature = WhatsNew.Feature(
 
 ### WhatsNew.FeatureGroup
 
-Display multiple pages in onboarding using FeatureGroup
+Display multiple pages in onboarding using `WhatsNew.FeatureGroup`.
 ```swift
 let feature = WhatsNew(
                 title: "WhatsNewKit",
@@ -449,20 +447,22 @@ let feature = WhatsNew(
                                 systemName: "star.fill",
                                 foregroundColor: .orange
                             ),
-                            title: "Showcase your new App Features1",
-                            subtitle: "Present your new app features...1"
+                            title: "Showcase your new App Features",
+                            subtitle: "Present your new app features..."
                         ),
                     ]),
                     .init(feature: [
                         .init(customView: {
                             Button(action: {
-                                print("Pressed2")
+                                print("Pressed")
                             }) {
-                                Text("This is a custom view2")
+                                Text("This is a custom view")
                             }
                         }),
                     ],
-                        action: .init(title: "Close", backgroundColor: .red, action: dismiss)
+                        action: .init(title: "Close", backgroundColor: .red, action: { progress, dismiss in
+                                  progress()
+                              })
                     )
                 ],
             )
@@ -485,13 +485,13 @@ let primaryAction = WhatsNew.PrimaryAction(
 )
 ```
 
-The action accept two `() -> Void` closers, the first progresses to the next Feature Group, or dismisses if it is the last group or a view initializes without groups (one group). The second cloeses the sheet.
+The action accept two `() -> Void` closures, the first progresses to the next Feature Group, or dismisses if it is the last group or a view initializes without groups (one group). The second closes the sheet.
 
 > Note: HapticFeedback will only be executed on iOS
 
 ### WhatsNew.SecondaryAction
 
-A `WhatsNew.SecondaryAction` which is displayed above the `WhatsNew.PrimaryAction` can be optionally supplied when initializing a `WhatsNew` instance and allows you to present an additional View, perform a custom action or open an URL.
+A `WhatsNew.SecondaryAction`, which is displayed above the `WhatsNew.PrimaryAction` can be optionally supplied when initializing a `WhatsNew` instance and allows you to present an additional View, perform a custom action or open an URL.
 
 ```swift
 // SecondaryAction that presents a View
