@@ -65,7 +65,7 @@ struct ContentView: View {
 ## Compatibility
 
 The package works with iOS 13+, macOS 11+ and visionOS v1. Some features only work on newer versions. Also, not all features have been tested on all versions.
-This package has not been tested on iOS 26 or macOS 26, but it soon will be.
+This package has not yet been tested on iOS 26 or macOS 26, but it will be soon.
 
 ## Installation
 
@@ -440,7 +440,7 @@ Display multiple pages in onboarding using `WhatsNew.FeatureGroup`.
 ```swift
 let feature = WhatsNew(
                 title: "WhatsNewKit",
-                featuresGroups: [
+                featureGroups: [
                     .init(feature: [
                         .init(
                             image: .init(
@@ -466,7 +466,6 @@ let feature = WhatsNew(
                     )
                 ],
             )
-        }
 ```
 
 ### WhatsNew.PrimaryAction
