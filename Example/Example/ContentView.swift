@@ -4,11 +4,7 @@ import WhatsNewKit
 // MARK: - ContentView
 
 /// The ContentView
-struct ContentView {}
-
-// MARK: - View
-
-extension ContentView: View {
+struct ContentView: View {
     
     /// The content and behavior of the view
     var body: some View {
