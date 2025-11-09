@@ -22,7 +22,7 @@ public extension WhatsNew {
         public var hapticFeedback: HapticFeedback?
         
         /// The optional on dismiss closure
-        public var action: ((() -> Void, () -> Void) -> Void)?
+        public var action: ((_ progress: () -> Void, _ dismiss: () -> Void) -> Void)?
         
         // MARK: Initializer
         
