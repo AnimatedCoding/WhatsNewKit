@@ -38,7 +38,7 @@ public extension WhatsNew {
             backgroundColor: Color = .accentColor,
             foregroundColor: Color = .white,
             hapticFeedback: HapticFeedback? = nil,
-            action: ((() -> Void, () -> Void) -> Void)? = FeatureGroup.defaultAction
+            action: ((_ progress: () -> Void, _ dismiss: () -> Void) -> Void)? = FeatureGroup.defaultAction
         ) {
             self.title = title
             self.backgroundColor = backgroundColor
