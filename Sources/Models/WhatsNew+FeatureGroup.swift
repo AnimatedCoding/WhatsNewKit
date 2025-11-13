@@ -4,9 +4,9 @@ public extension WhatsNew {
     /// The struct representing a group of feature that apear on the same screen
     struct FeatureGroup {
         /// The list of `Feature`
-        var features: [Feature]
+        public var features: [Feature]
         /// The ondismiss
-        var primaryAction: PrimaryAction
+        public var primaryAction: PrimaryAction
         /// The optional SecondaryAction
         public var secondaryAction: SecondaryAction?
         
