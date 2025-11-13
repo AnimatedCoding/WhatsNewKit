@@ -65,7 +65,7 @@ struct ContentView: View {
 ## Compatibility
 
 The package works with iOS 13+, macOS 11+ and visionOS v1. Some features only work on newer versions. Also, not all features have been tested on all versions.
-This package has not yet been tested on iOS 26 or macOS 26, but it will be soon.
+This package has been tested on iOS 26 and macOS 26 and works.
 
 ## Installation
 

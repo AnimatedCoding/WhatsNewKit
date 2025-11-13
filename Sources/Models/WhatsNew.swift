@@ -50,11 +50,11 @@ public struct WhatsNew {
     public init(
         version: Version = .current(),
         title: Title,
-        featuresGroups: [FeatureGroup],
+        featureGroups: [FeatureGroup],
     ) {
         self.version = version
         self.title = title
-        self.featureGroups = featuresGroups
+        self.featureGroups = featureGroups
         if !featureGroups.isEmpty {
             self.selectedFeature = featureGroups[0]
         }
