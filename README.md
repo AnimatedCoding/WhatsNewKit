@@ -5,8 +5,12 @@
 </p>
 
 <h1 align="center">
-    WhatsNewKit
+    WhatsNewKit v2
 </h1>
+
+<h2>
+    Branch by Animated Coding
+</h2>
 
 <p align="center">
     A Swift Package to easily showcase your new app features.
