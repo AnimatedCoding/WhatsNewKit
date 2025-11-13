@@ -21,7 +21,7 @@ public struct WhatsNewView {
     
     /// The View that is presented by the SecondaryAction
     @State
-    private var secondaryActionPresentedView: WhatsNew.SecondaryAction.Action.PresentedView?
+    private var secondaryActionPresentedView: WhatsNew.StructSecondaryAction.Action.PresentedView?
     
     /// The PresentationMode
     @Environment(\.presentationMode)
@@ -353,7 +353,7 @@ private extension WhatsNewView {
                 }
                 .buttonStyle(
                     PrimaryButtonStyle(
-                        primaryAction: WhatsNew.PrimaryAction(),
+                        primaryAction: PrimaryAction(),
                         layout: self.layout
                     )
                 )

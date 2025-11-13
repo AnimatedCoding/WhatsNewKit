@@ -8,7 +8,7 @@ extension WhatsNewView {
     struct PrimaryButtonStyle {
         
         /// The WhatsNew PrimaryAction
-        let primaryAction: WhatsNew.PrimaryAction
+        let primaryAction: WhatsNew.PrimaryActionProtocal
         
         /// The WhatsNew Layout
         let layout: WhatsNew.Layout

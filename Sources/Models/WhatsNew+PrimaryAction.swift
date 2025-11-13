@@ -4,8 +4,8 @@ import SwiftUI
 
 public extension WhatsNew {
     
-    /// The WhatsNew PrimaryAction
-    protocol PrimaryAction {
+    /// The WhatsNew PrimaryActionProtocal
+    protocol PrimaryActionProtocal {
         var title: Text { get set }
         
         /// The background color
@@ -21,7 +21,7 @@ public extension WhatsNew {
         var action: ((_ progress: () -> Void, _ dismiss: () -> Void) -> Void)? { get set }
     }
     ///
-    struct StructPrimaryAction: PrimaryAction {
+    struct StructPrimaryAction: PrimaryActionProtocal {
         
         // MARK: Properties
         
@@ -66,7 +66,7 @@ public extension WhatsNew {
     }
     
     /// A percistant WhatsNew PrimaryAction, so you can edit it while it is presented
-    class PercistablePrimaryAction: PrimaryAction {
+    class PercistablePrimaryAction: PrimaryActionProtocal {
         
         // MARK: Properties
         
@@ -111,3 +111,5 @@ public extension WhatsNew {
     }
     
 }
+
+public typealias PrimaryAction = WhatsNew.StructPrimaryAction

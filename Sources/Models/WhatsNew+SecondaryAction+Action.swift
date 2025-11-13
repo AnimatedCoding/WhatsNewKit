@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - SecondaryAction+Action
 
-public extension WhatsNew.SecondaryAction {
+public extension WhatsNew.StructSecondaryAction {
     
     /// A WhatsNew Secondary Action
     enum Action {
@@ -16,7 +16,7 @@ public extension WhatsNew.SecondaryAction {
 
 // MARK: - Action+present
 
-public extension WhatsNew.SecondaryAction.Action {
+public extension WhatsNew.StructSecondaryAction.Action {
     
     /// Present View on WhatsNewView
     /// - Parameters:
@@ -32,7 +32,7 @@ public extension WhatsNew.SecondaryAction.Action {
 
 // MARK: - Action+dismiss
 
-public extension WhatsNew.SecondaryAction.Action {
+public extension WhatsNew.StructSecondaryAction.Action {
     
     /// Dismiss WhatsNewView
     static let dismiss: Self = .custom { presentationMode in
@@ -43,7 +43,7 @@ public extension WhatsNew.SecondaryAction.Action {
 
 // MARK: - Action+openURL
 
-public extension WhatsNew.SecondaryAction.Action {
+public extension WhatsNew.StructSecondaryAction.Action {
     
     /// Open a URL
     /// - Parameters:
@@ -76,7 +76,7 @@ public extension WhatsNew.SecondaryAction.Action {
 
 // MARK: - Action+PresentedView
 
-extension WhatsNew.SecondaryAction.Action {
+extension WhatsNew.StructSecondaryAction.Action {
     
     /// The WhatsNew Secondary Action PresentedView
     struct PresentedView: Identifiable {

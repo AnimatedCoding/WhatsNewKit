@@ -4,8 +4,8 @@ import SwiftUI
 
 public extension WhatsNew {
     
-    /// The WhatsNew SecondaryAction
-    protocol SecondaryAction {
+    /// The WhatsNew SecondaryActionProtocol
+    protocol SecondaryActionProtocol {
         var title: Text { get set }
         
         /// The foreground color
@@ -15,10 +15,10 @@ public extension WhatsNew {
         var hapticFeedback: HapticFeedback? { get set }
         
         /// The Action
-        var action: Action { get set }
+        var action: StructSecondaryAction.Action { get set }
     }
     ///
-    struct StructSecondaryAction: SecondaryAction {
+    struct StructSecondaryAction: SecondaryActionProtocol {
         
         // MARK: Properties
         
@@ -36,7 +36,7 @@ public extension WhatsNew {
         
         // MARK: Initializer
         
-        /// Creates a new instance of `WhatsNew.PrimaryAction`
+        /// Creates a new instance of `WhatsNew.SecondaryAction`
         /// - Parameters:
         ///   - title: The title Text
         ///   - foregroundColor: The foreground color. Default value `.accentColor`
@@ -63,7 +63,7 @@ public extension WhatsNew {
     }
     
     /// A persistant WhatsNew SecondaryAction
-    class PersistantSecondaryAction: SecondaryAction {
+    class PersistantSecondaryAction: SecondaryActionProtocol {
         
         // MARK: Properties
         
@@ -77,11 +77,11 @@ public extension WhatsNew {
         public var hapticFeedback: HapticFeedback?
         
         /// The Action
-        public var action: Action
+        public var action: StructSecondaryAction.Action
         
         // MARK: Initializer
         
-        /// Creates a new instance of `WhatsNew.PrimaryAction`
+        /// Creates a new instance of `WhatsNew.SecondaryAction`
         /// - Parameters:
         ///   - title: The title Text
         ///   - foregroundColor: The foreground color. Default value `.accentColor`
@@ -97,7 +97,7 @@ public extension WhatsNew {
                 #endif
             }(),
             hapticFeedback: HapticFeedback? = nil,
-            action: Action
+            action: StructSecondaryAction.Action
         ) {
             self.title = title
             self.foregroundColor = foregroundColor
@@ -107,3 +107,5 @@ public extension WhatsNew {
         
     }
 }
+
+public typealias SecondaryAction = WhatsNew.StructSecondaryAction

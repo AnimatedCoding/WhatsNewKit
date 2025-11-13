@@ -6,9 +6,9 @@ public extension WhatsNew {
         /// The list of `Feature`
         public var features: [Feature]
         /// The ondismiss
-        public var primaryAction: PrimaryAction
+        public var primaryAction: PrimaryActionProtocal
         /// The optional SecondaryAction
-        public var secondaryAction: SecondaryAction?
+        public var secondaryAction: SecondaryActionProtocol?
         
         /// Initializer
         /// - Parameters:
@@ -16,8 +16,8 @@ public extension WhatsNew {
         ///   - action: The `PrimaryAction` that the main button calls
         ///   - secondaryAction: The optional `SecondaryAction`
         public init(feature: [Feature],
-                    action: PrimaryAction = StructPrimaryAction(action: FeatureGroup.defaultAction),
-                    secondaryAction: SecondaryAction? = nil
+                    action: PrimaryActionProtocal = StructPrimaryAction(action: FeatureGroup.defaultAction),
+                    secondaryAction: SecondaryActionProtocol? = nil
         ) {
             self.features = feature
             self.primaryAction = action
