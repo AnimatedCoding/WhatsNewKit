@@ -482,6 +482,8 @@ The action accept two `() -> Void` closures, the first progresses to the next Fe
 
 > Note: HapticFeedback will only be executed on iOS
 
+> Note: PrimaryAction and SecondaryAction both have persistant versions, PercistablePrimaryAction and PersistantSecondaryAction, that are classes so you can edit them while they are being presented
+
 ### WhatsNew.SecondaryAction
 
 A `WhatsNew.SecondaryAction`, which is displayed above the `WhatsNew.PrimaryAction` can be optionally supplied when initializing a `WhatsNew` instance and allows you to present an additional View, perform a custom action or open an URL.
