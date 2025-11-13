@@ -15,25 +15,19 @@
 </p>
 
 <p align="center">
-   <a href="https://swiftpackageindex.com/SvenTiigi/WhatsNewKit">
-    <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FSvenTiigi%2FWhatsNewKit%2Fbadge%3Ftype%3Dswift-versions" alt="Swift Version">
+   <a href="https://swiftpackageindex.com/AnimatedCoding/WhatsNewKit">
+    <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAnimatedCoding%2FWhatsNewKit%2Fbadge%3Ftype%3Dswift-versions" alt="Swift Version">
    </a>
-   <a href="https://swiftpackageindex.com/SvenTiigi/WhatsNewKit">
-    <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FSvenTiigi%2FWhatsNewKit%2Fbadge%3Ftype%3Dplatforms" alt="Platforms">
+   <a href="https://swiftpackageindex.com/AnimatedCoding/WhatsNewKit">
+    <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAnimatedCoding%2FWhatsNewKit%2Fbadge%3Ftype%3Dplatforms" alt="Platforms">
    </a>
    <br/>
-   <a href="https://github.com/SvenTiigi/WhatsNewKit/actions/workflows/build_and_test.yml">
-       <img src="https://github.com/SvenTiigi/WhatsNewKit/actions/workflows/build_and_test.yml/badge.svg" alt="Build and Test Status">
+   <!--<a href="https://github.com/AnimatedCoding/WhatsNewKit/actions/workflows/build_and_test.yml">
+       <img src="https://github.com/AnimatedCoding/WhatsNewKit/actions/workflows/build_and_test.yml/badge.svg" alt="Build and Test Status">
    </a>
-   <a href="https://sventiigi.github.io/WhatsNewKit/documentation/whatsnewkit/">
+   <a href="https://https://animatedcoding.github.io/WhatsNewKit/documentation/whatsnewkit/">
        <img src="https://img.shields.io/badge/Documentation-DocC-blue" alt="Documentation">
-   </a>
-   <a href="https://twitter.com/SvenTiigi/">
-      <img src="https://img.shields.io/badge/Twitter-@SvenTiigi-blue.svg?style=flat" alt="Twitter">
-   </a>
-   <a href="https://mastodon.world/@SvenTiigi">
-      <img src="https://img.shields.io/badge/Mastodon-@SvenTiigi-8c8dff.svg?style=flat" alt="Mastodon">
-   </a>
+   </a>-->
 </p>
 
 <img align="right" width="315" src="Assets/example.png" alt="Example">
