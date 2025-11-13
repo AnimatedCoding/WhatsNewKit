@@ -16,7 +16,7 @@ public extension WhatsNew {
         ///   - action: The `PrimaryAction` that the main button calls
         ///   - secondaryAction: The optional `SecondaryAction`
         public init(feature: [Feature],
-                    action: PrimaryAction = PrimaryAction(action: FeatureGroup.defaultAction),
+                    action: PrimaryAction = StructPrimaryAction(action: FeatureGroup.defaultAction),
                     secondaryAction: SecondaryAction? = nil
         ) {
             self.features = feature
