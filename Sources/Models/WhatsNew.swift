@@ -32,8 +32,8 @@ public struct WhatsNew {
         version: Version = .current(),
         title: Title,
         features: [Feature],
-        primaryAction: PrimaryActionProtocal = StructPrimaryAction.init(),
-        secondaryAction: SecondaryActionProtocol? = nil
+        primaryAction: PrimaryAction = .init(),
+        secondaryAction: SecondaryAction? = nil
     ) {
         self.version = version
         self.title = title
