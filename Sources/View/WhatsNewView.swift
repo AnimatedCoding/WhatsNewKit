@@ -181,6 +181,9 @@ private extension WhatsNewView {
                     alignment: self.layout.featureHorizontalAlignment,
                     spacing: self.layout.featureHorizontalSpacing
                 ) {
+                    if self.layout.featureSidewaysAlignment == .trailing {
+                        Spacer()
+                    }
                     feature
                         .image
                         .view()
@@ -202,7 +205,10 @@ private extension WhatsNewView {
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                     }
-                    .multilineTextAlignment(.leading)
+                    .multilineTextAlignment(self.layout.featureTextAlignment)
+                    if self.layout.featureSidewaysAlignment == .leading {
+                        Spacer()
+                    }
                 }
             } else if let customViewBuilder = feature.customViewBuilder {
                 /// Present a custom view
