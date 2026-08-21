@@ -36,7 +36,7 @@ public extension WhatsNew {
         /// The feature horizontal alignment
         public var featureHorizontalAlignment: VerticalAlignment
 
-        /// The feature text alignment
+        /// The feature text alignment, this is not applied to custom views
         public var featureSidewaysAlignment: SidewaysAlignment
 
         enum SidewaysAlignment {
