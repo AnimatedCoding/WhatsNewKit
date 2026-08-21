@@ -32,6 +32,20 @@ public extension WhatsNew {
             self.feature = Default(image: image, title: title, subtitle: subtitle)
             self.customViewBuilder = nil
         }
+
+        /// Creates a new instance of `WhatsNew.Feature` using the `Default` method, but accept string peramiters
+        /// - Parameters:
+        ///   - image: The system image name (String)
+        ///   - title: The title String
+        ///   - subtitle: The subtitle String
+        public init(
+            systemName: String,
+            title: String,
+            subtitle: String
+        ) {
+            self.feature = Default(image: Image(systemName: image), title: Text(title), subtitle: Text(subtitle))
+            self.customViewBuilder = nil
+        }
         
         /// Creates a new instance of `WhatsNew.Feature` in custom view mode
         ///  - Parameters:
