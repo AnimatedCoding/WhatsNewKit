@@ -42,7 +42,8 @@ public struct FeatureView: View {
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             }
-            .multilineTextAlignment(.leading)
+            .multilineTextAlignment(self.layout.featureTextAlignment)
+            Spacer()
         }
     }
 }
