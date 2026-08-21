@@ -35,6 +35,9 @@ public extension WhatsNew {
 
         /// The feature horizontal alignment
         public var featureHorizontalAlignment: VerticalAlignment
+
+        /// The feature text alignment
+        public var featureTextAlignment: TextAlignment
         
         /// The feature vertical spacing
         public var featureVerticalSpacing: CGFloat
@@ -74,6 +77,7 @@ public extension WhatsNew {
             featureImageWidth: CGFloat = 40,
             featureHorizontalSpacing: CGFloat = 15,
             featureHorizontalAlignment: VerticalAlignment = .center,
+            featureTextAlignment: TextAlignment = .leading,
             featureVerticalSpacing: CGFloat = 2,
             footerActionSpacing: CGFloat = 15,
             footerPrimaryActionButtonCornerRadius: CGFloat = 14,
@@ -88,6 +92,7 @@ public extension WhatsNew {
             self.featureImageWidth = featureImageWidth
             self.featureHorizontalSpacing = featureHorizontalSpacing
             self.featureHorizontalAlignment = featureHorizontalAlignment
+            self.featureTextAlignment = featureTextAlignment
             self.featureVerticalSpacing = featureVerticalSpacing
             self.footerActionSpacing = footerActionSpacing
             self.footerPrimaryActionButtonCornerRadius = footerPrimaryActionButtonCornerRadius
