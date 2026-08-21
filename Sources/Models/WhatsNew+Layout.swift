@@ -39,7 +39,7 @@ public extension WhatsNew {
         /// The feature text alignment, this is not applied to custom views
         public var featureSidewaysAlignment: SidewaysAlignment
 
-        enum SidewaysAlignment {
+        public enum SidewaysAlignment {
             case leading, center, trailing
         }
         
