@@ -37,7 +37,11 @@ public extension WhatsNew {
         public var featureHorizontalAlignment: VerticalAlignment
 
         /// The feature text alignment
-        public var featureTextAlignment: TextAlignment
+        public var featureSidewaysAlignment: SidewaysAlignment
+
+        enum SidewaysAlignment {
+            case leading, center, trailing
+        }
         
         /// The feature vertical spacing
         public var featureVerticalSpacing: CGFloat
