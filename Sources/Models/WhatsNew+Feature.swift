@@ -43,7 +43,7 @@ public extension WhatsNew {
             title: String,
             subtitle: String
         ) {
-            self.feature = Default(image: Image(systemName: image), title: Text(title), subtitle: Text(subtitle))
+            self.feature = Default(image: Image(systemName: systemName), title: Text(title), subtitle: Text(subtitle))
             self.customViewBuilder = nil
         }
         
