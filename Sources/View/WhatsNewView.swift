@@ -205,7 +205,7 @@ private extension WhatsNewView {
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                     }
-                    .multilineTextAlignment(self.layout.featureTextAlignment)
+                    .multilineTextAlignment(.leading)
                     if self.layout.featureSidewaysAlignment == .leading {
                         Spacer()
                     }
