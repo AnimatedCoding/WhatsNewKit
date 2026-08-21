@@ -21,6 +21,9 @@ public struct FeatureView: View {
             alignment: self.layout.featureHorizontalAlignment,
             spacing: self.layout.featureHorizontalSpacing
         ) {
+            if self.layout.featureSidewaysAlignment == .trailing {
+                Spacer()
+            }
             feature
                 .image
                 .view()
@@ -42,8 +45,10 @@ public struct FeatureView: View {
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             }
-            .multilineTextAlignment(self.layout.featureTextAlignment)
-            Spacer()
+            .multilineTextAlignment(.leading)
+            if self.layout.featureSidewaysAlignment == .trailing {
+                Spacer()
+            }
         }
     }
 }
