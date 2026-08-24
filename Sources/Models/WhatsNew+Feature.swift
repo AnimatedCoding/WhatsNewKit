@@ -41,9 +41,10 @@ public extension WhatsNew {
         public init(
             systemName: String,
             title: String,
-            subtitle: String
+            subtitle: String,
+            foregroundStyle: Color? = .accentColor,
         ) {
-            self.feature = Default(image: Image(systemName: systemName), title: Text(title), subtitle: Text(subtitle))
+            self.feature = Default(image: .init(systemName: systemName, foregroundColor: foregroundStyle), title: Text(title), subtitle: Text(subtitle))
             self.customViewBuilder = nil
         }
         
@@ -53,10 +54,14 @@ public extension WhatsNew {
         ///   - useDefaultStyling: This sets the button style to be the same as the main action button, it defaults to `true`
         public init<Content: View>(
             @ViewBuilder customView: @escaping () -> Content,
-            useDefaultStyling: Bool = true
+            useDefaultStyling: Bool = true,
+            foregroundStyle: Color = .accentColor,
         ) {
             self.feature = nil
-            self.customViewBuilder = { AnyView(customView()) }
+            self.customViewBuilder = { AnyView(
+                customView()
+                    .foregroundStyle(foregroundStyle)
+            ) }
             self.useDefaultStyling = useDefaultStyling
         }
     }

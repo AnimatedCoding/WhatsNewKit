@@ -94,12 +94,17 @@ extension WhatsNewView: View {
             .alwaysBounceVertical(false)
 #endif
             // Footer
-            if #available(iOS 15, macOS 12, *) {
+            if #available(iOS 26, macOS 26, *) {
+                self.footer
+                    .buttonStyle(.glassProminent)
+                    .padding(.bottom)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+            } else if #available(iOS 15, macOS 12, *) {
                 VStack {
                     VStack {
                         self.footer
                     }
-                    //.modifier(FooterPadding())
+                    .modifier(FooterPadding())
 #if os(iOS)
                     .background(
                         UIVisualEffectView
@@ -188,7 +193,6 @@ private extension WhatsNewView {
                         .image
                         .view()
                         .frame(width: self.layout.featureImageWidth)
-                        .foregroundStyle(.tint)
                     VStack(
                         alignment: .leading,
                         spacing: self.layout.featureVerticalSpacing
@@ -215,11 +219,8 @@ private extension WhatsNewView {
                 /// Present a custom view
                 if feature.useDefaultStyling, let groupIndex {
                     customViewBuilder()
-                        .buttonStyle(PrimaryButtonStyle(
-                            primaryAction: whatsNew.featureGroups[groupIndex].primaryAction,
-                            layout: self.layout
-                        ))
                         .multilineTextAlignment(.leading)
+                        .environment(\.whatsNewLayout, self.layout)
                 } else {
                     customViewBuilder()
                 }
