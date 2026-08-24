@@ -188,6 +188,7 @@ private extension WhatsNewView {
                         .image
                         .view()
                         .frame(width: self.layout.featureImageWidth)
+                        .foregroundStyle(.tint)
                     VStack(
                         alignment: .leading,
                         spacing: self.layout.featureVerticalSpacing
