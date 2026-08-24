@@ -99,7 +99,7 @@ extension WhatsNewView: View {
                     VStack {
                         self.footer
                     }
-                    .modifier(FooterPadding())
+                    //.modifier(FooterPadding())
 #if os(iOS)
                     .background(
                         UIVisualEffectView
