@@ -30,6 +30,6 @@ public extension EnvironmentValues {
     
 }
 
-extension EnvironmentValues {
+public extension EnvironmentValues {
     @Entry var whatsNewLayout: WhatsNew.Layout = .init()
 }

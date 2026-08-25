@@ -113,7 +113,7 @@ extension WhatsNewView: View {
                         }
                         ToolbarItem(placement: .title, content: {
                             self.title
-                                .padding(.top)
+                                .padding(.top, isScrolled ? 20 : 40)
                                 .transition(.scale)
                                 .scaleEffect(isScrolled ? CGSize(width: 0.5, height: 0.5) : CGSize(width: 1, height: 1))
                                 .animation(.easeInOut, value: isScrolled)
