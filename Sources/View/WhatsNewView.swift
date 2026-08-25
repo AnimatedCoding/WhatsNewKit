@@ -90,50 +90,44 @@ extension WhatsNewView: View {
                         self.layout.scrollViewBottomContentInset
                     )
             }
-#if os(iOS)
-            .alwaysBounceVertical(false)
-#endif
-            // Footer
-            if #available(iOS 26, macOS 26, *) {
-                self.footer
-                    .buttonStyle(.glassProminent)
-                    .padding(.bottom)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
-            } else if #available(iOS 15, macOS 12, *) {
-                VStack {
+            .overlay(alignment: .bottom) {
+                // Footer
+                if #available(iOS 26, macOS 26, *) {
+                    self.footer
+                        .buttonStyle(.glassProminent)
+                        .padding(.bottom)
+                        .padding(.horizontal)
+                } else if #available(iOS 15, macOS 12, *) {
                     VStack {
-                        self.footer
-                    }
-                    .modifier(FooterPadding())
-#if os(iOS)
-                    .background(
-                        UIVisualEffectView
-                            .Representable()
-                            .edgesIgnoringSafeArea(.horizontal)
-                            .padding(self.layout.footerVisualEffectViewPadding)
-                    )
-#endif
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.top)
-                .background {
+                        VStack {
+                            self.footer
+                        }
+                         .buttonStyle(.borderedProminent)
+                         .padding(.bottom, 0)
+                     }
+                     .padding(.horizontal)
+                     .padding(.top, 40)
+                     .background {
 #if os(macOS)
-                    Color(nsColor: NSColor.windowBackgroundColor)
+                         let color = Color(.windowBackgroundColor)
 #else
-                    Color(uiColor: UIColor.systemBackground)
+                         let color = Color(.systemBackground)
 #endif
-                }
-                .edgesIgnoringSafeArea(.bottom)
-                .frame(maxHeight: .infinity, alignment: .bottom)
-            } else {
-                VStack {
-                    Spacer()
-                    VStack {
-                        self.footer
-                    }
-                    .modifier(FooterPadding())
-                }
-                .edgesIgnoringSafeArea(.bottom)
+                         VStack(spacing: 0) {
+                             color
+                                 .mask(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [.clear, .black]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                 )
+                                 .frame(height: 40) // same as top padding
+                             color
+                         }
+                         .edgesIgnoringSafeArea(.bottom)
+                     }
+                 }
             }
         }
         .sheet(
@@ -147,7 +141,7 @@ extension WhatsNewView: View {
             )
         }
         .onAppear {
-            if let i = whatsNew.selectedFeature {
+            if whatsNew.selectedFeature != nil {
                 groupIndex = 0
             }
         }
@@ -217,7 +211,7 @@ private extension WhatsNewView {
                 }
             } else if let customViewBuilder = feature.customViewBuilder {
                 /// Present a custom view
-                if feature.useDefaultStyling, let groupIndex {
+                if feature.useDefaultStyling {
                     customViewBuilder()
                         .multilineTextAlignment(.leading)
                         .environment(\.whatsNewLayout, self.layout)
@@ -336,22 +330,20 @@ private extension WhatsNewView {
             if let primaryAction = self.whatsNew.selectedFeature?.primaryAction {
                 Button(
                     action: {
-                        // Invoke HapticFeedback, if available
-                        primaryAction.hapticFeedback
                         // Invoke on dismiss, if available
                         primaryAction.action?(moveToNext, dismiss)
                     }
                 ) {
-                    Text(
-                        whatsNewText:primaryAction.title
-                    )
+                    HStack {
+                        Spacer()
+                        Text(
+                            whatsNewText:primaryAction.title
+                        )
+                        .font(.headline.weight(.semibold))
+                        Spacer()
+                    }
+                    .padding()
                 }
-                .buttonStyle(
-                    PrimaryButtonStyle(
-                        primaryAction: primaryAction,
-                        layout: self.layout
-                    )
-                )
 #if os(macOS)
                 .keyboardShortcut(.defaultAction)
 #endif
@@ -359,12 +351,6 @@ private extension WhatsNewView {
                 Button(action: {}) {
                     Text("Loading")
                 }
-                .buttonStyle(
-                    PrimaryButtonStyle(
-                        primaryAction: WhatsNew.PrimaryAction(),
-                        layout: self.layout
-                    )
-                )
 #if os(macOS)
                 .keyboardShortcut(.defaultAction)
 #endif
@@ -391,4 +377,29 @@ private extension WhatsNewView {
             self.presentationMode.wrappedValue.dismiss()
         }
     }
+}
+
+@available(iOS 17, macOS 14, *)
+#Preview {
+    @Previewable @State var whatsNew: WhatsNew? = WhatsNew(title: "PPPP", featureGroups: [
+        .init(feature: [
+            .init(systemName: "richtext.page.ja", title: "Yay", subtitle: "TAK", foregroundStyle: .red),
+            .init(systemName: "pencil", title: "🍡🍡🍡", subtitle: "", foregroundStyle: .orange),
+            .init(systemName: "pencil", title: "Yay", subtitle: "", foregroundStyle: .yellow),
+            .init(systemName: "pencil", title: "Yay", subtitle: "t", foregroundStyle: .green),
+            .init(systemName: "pencil", title: "P", subtitle: "a", foregroundStyle: .cyan),
+            .init(systemName: "pencil", title: "P", subtitle: "k", foregroundStyle: .blue),
+            .init(systemName: "formfitting.gamecontroller.fill", title: "P", subtitle: "", foregroundStyle: .purple),
+            .init(systemName: "pencil", title: "P", subtitle: "", foregroundStyle: .pink),
+            .init(systemName: "pencil", title: "Hay", subtitle: "", foregroundStyle: .red),
+            .init(systemName: "a.book.closed.ja", title: "Miku", subtitle: "", foregroundStyle: .pink),
+            .init(systemName: "star", title: "Miku", subtitle: "", foregroundStyle: .pink),
+            .init(systemName: "pencil", title: "Beam", subtitle: "☆", foregroundStyle: .pink),
+        ]),
+    ])
+    Text("YAY")
+        .sheet(whatsNew: $whatsNew)
+    #if os(macOS)
+        .frame(minWidth: 500, minHeight:  500)
+    #endif
 }

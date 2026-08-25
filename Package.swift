@@ -5,8 +5,8 @@ import PackageDescription
 let package = Package(
     name: "WhatsNewKit",
     platforms: [
-        .iOS(.v15),
-        .macOS(.v12),
+        .iOS(.v16),
+        .macOS(.v13),
         .visionOS(.v1)
     ],
     products: [

@@ -134,6 +134,7 @@ extension WhatsNew.Feature: Hashable {
         if let d = self.feature {
             hasher.combine(d.title)
             hasher.combine(d.subtitle)
+            hasher.combine(d.image.id)
         } else {
             
         }

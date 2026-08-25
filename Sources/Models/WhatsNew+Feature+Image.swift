@@ -12,6 +12,8 @@ public extension WhatsNew.Feature {
         /// A closure that produces the Image View
         public let view: () -> AnyView
         
+        public var id: String
+        
         // MARK: Initializer
         
         /// Creates a new instance of `WhatsNew.Feature.Image`
@@ -22,6 +24,7 @@ public extension WhatsNew.Feature {
             image: @escaping () -> Image
         ) {
             self.view = { .init(image()) }
+            id = UUID().uuidString
         }
         
     }
@@ -38,6 +41,7 @@ public extension WhatsNew.Feature.Image {
         image: Image
     ) {
         self.init { image }
+        id = UUID().uuidString
     }
     
 }
@@ -68,6 +72,7 @@ public extension WhatsNew.Feature.Image {
             .imageScale(.large)
             .foregroundColor(foregroundColor)
         }
+        id = name
     }
     
 }
@@ -95,6 +100,7 @@ public extension WhatsNew.Feature.Image {
             .imageScale(.large)
             .foregroundColor(foregroundColor)
         }
+        id = systemName
     }
     
     /// Creates a new instance of `WhatsNew.Feature.Image`
@@ -120,6 +126,7 @@ public extension WhatsNew.Feature.Image {
             .imageScale(.large)
             .foregroundColor(foregroundColor)
         }
+        id = systemName
     }
     
 }
