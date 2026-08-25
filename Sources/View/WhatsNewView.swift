@@ -7,6 +7,9 @@ public struct WhatsNewView {
     
     // MARK: Properties
     
+    @Environment(\.dismiss) private var dismissSheet
+    
+    @State private var top: WhatsNew.Feature?
     
     /// The current `FeatureGroup`
     @State public var groupIndex: Int? = nil
@@ -42,6 +45,9 @@ public struct WhatsNewView {
         self.whatsNew = whatsNew
         self.whatsNewVersionStore = versionStore
         self.layout = layout
+        if let groupIndex {
+            top = whatsNew.featureGroups[groupIndex].features.first
+        }
     }
     /// Sets the `WhatsNew.selectedFeature` to the first in `WhatsNew.featureGroups`
 }
@@ -52,82 +58,207 @@ extension WhatsNewView: View {
     
     /// The content and behavior of the view.
     public var body: some View {
-        ZStack {
+        NavigationStack {
             // Content ScrollView
-            ScrollView(
-                .vertical,
-                showsIndicators: self.layout.showsScrollViewIndicators
-            ) {
-                // Content Stack
-                VStack(
-                    spacing: self.layout.contentSpacing
+            if #available(iOS 18.0, macOS 15, *) {
+                ScrollView(
+                    .vertical,
+                    showsIndicators: self.layout.showsScrollViewIndicators
                 ) {
-                    // Title
-                    self.title
-                        .transition(.slide)
-                        .frame(maxWidth: .infinity)
-                    // Feature List
+                    //                // Content Stack
                     VStack(
-                        alignment: .leading,
-                        spacing: self.layout.featureListSpacing
+                        spacing: self.layout.contentSpacing
                     ) {
-                        // Feature
-                        ForEach(
-                            self.whatsNew.selectedFeature?.features ?? [],
-                            id: \.self,
-                            content: self.feature
-                        )
+                        // Title
+#if os(iOS) && !targetEnvironment(macCatalyst)
+#else
+                        self.title
+                            .transition(.slide)
+                            .frame(maxWidth: .infinity)
+#endif
+                        // Feature List
+                        VStack(
+                            alignment: .leading,
+                            spacing: self.layout.featureListSpacing
+                        ) {
+                            // Feature
+                            ForEach(
+                                self.whatsNew.selectedFeature?.features ?? [],
+                                id: \.self,
+                                content: self.feature
+                            )
+                            
+                        }
+                        .scrollTargetLayout()
+                        .modifier(FeaturesPadding())
+                        .padding(self.layout.featureListPadding)
                     }
-                    .modifier(FeaturesPadding())
-                    .padding(self.layout.featureListPadding)
+                    .padding(.top, 40)
+                    .padding(.horizontal)
+                    //.padding(self.layout.contentPadding)
+#if targetEnvironment(macCatalyst)
+                    // Stupid that this is needed for scroll view to work
+                    .background {
+                        Color(.systemBackground)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+#endif
+#if os(iOS) && !targetEnvironment(macCatalyst)
+                    .toolbar {
+                        var isScrolled: Bool {
+                            if let groupIndex, top == whatsNew.featureGroups[groupIndex].features.first {
+                                return false
+                            }
+                            return true
+                        }
+                        ToolbarItem(placement: .title, content: {
+                            self.title
+                                .padding(.top)
+                                .transition(.scale)
+                                .scaleEffect(isScrolled ? CGSize(width: 0.5, height: 0.5) : CGSize(width: 1, height: 1))
+                                .animation(.easeInOut, value: isScrolled)
+                            //.frame(maxWidth: .infinity)
+                        })
+                    }
+                    .toolbarTitleDisplayMode(.inlineLarge)
+#endif
+                    // ScrollView bottom content inset
+                    Color.clear
+                        .padding(
+                            .bottom,
+                            self.layout.scrollViewBottomContentInset
+                        )
                 }
-                .padding(.horizontal)
-                .padding(self.layout.contentPadding)
-                // ScrollView bottom content inset
-                Color.clear
-                    .padding(
-                        .bottom,
-                        self.layout.scrollViewBottomContentInset
-                    )
-            }
-            .overlay(alignment: .bottom) {
-                // Footer
-                if #available(iOS 26, macOS 26, *) {
-                    self.footer
-                        .buttonStyle(.glassProminent)
-                        .padding(.bottom)
+                .onScrollTargetVisibilityChange(idType: WhatsNew.Feature.self, { visible in
+                    top = visible.first
+                })
+#if targetEnvironment(macCatalyst)
+                .background {
+                    Color(.systemBackground)
+                }
+#endif
+                .overlay(alignment: .bottom) {
+                    // Footer
+                    if #available(iOS 26, macOS 26, *) {
+                        self.footer
+                            .buttonStyle(.glassProminent)
+                            .padding(.bottom)
+                            .padding(.horizontal)
+                    } else {
+                        VStack {
+                            VStack {
+                                self.footer
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .padding(.bottom, 0)
+                        }
                         .padding(.horizontal)
-                } else if #available(iOS 15, macOS 12, *) {
+                        .padding(.top, 40)
+                        .background {
+#if os(macOS)
+                            let color = Color(.windowBackgroundColor)
+#else
+                            let color = Color(.systemBackground)
+#endif
+                            VStack(spacing: 0) {
+                                color
+                                    .mask(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [.clear, .black]),
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .frame(height: 40) // same as top padding
+                                color
+                            }
+                            .edgesIgnoringSafeArea(.bottom)
+                        }
+                    }
+                }
+            //MARK: -- Older
+            } else {
+                ScrollView(
+                    .vertical,
+                    showsIndicators: self.layout.showsScrollViewIndicators
+                ) {
+                    //                // Content Stack
+                    VStack(
+                        spacing: self.layout.contentSpacing
+                    ) {
+                        // Title
+                        self.title
+                            .transition(.slide)
+                            .frame(maxWidth: .infinity)
+                        // Feature List
+                        VStack(
+                            alignment: .leading,
+                            spacing: self.layout.featureListSpacing
+                        ) {
+                            // Feature
+                            ForEach(
+                                self.whatsNew.selectedFeature?.features ?? [],
+                                id: \.self,
+                                content: self.feature
+                            )
+                            
+                        }
+                        .modifier(FeaturesPadding())
+                        .padding(self.layout.featureListPadding)
+                    }
+                    .padding(.top, 40)
+                    .padding(.horizontal)
+                    //.padding(self.layout.contentPadding)
+#if targetEnvironment(macCatalyst)
+                    .background {
+                        Color(.systemBackground)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+#endif
+                    // ScrollView bottom content inset
+                    Color.clear
+                        .padding(
+                            .bottom,
+                            self.layout.scrollViewBottomContentInset
+                        )
+                }
+#if targetEnvironment(macCatalyst)
+                .background {
+                    Color(.systemBackground)
+                }
+#endif
+                .overlay(alignment: .bottom) {
+                    // Footer
                     VStack {
                         VStack {
                             self.footer
                         }
-                         .buttonStyle(.borderedProminent)
-                         .padding(.bottom, 0)
-                     }
-                     .padding(.horizontal)
-                     .padding(.top, 40)
-                     .background {
+                        .buttonStyle(.borderedProminent)
+                        .padding(.bottom, 0)
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 40)
+                    .background {
 #if os(macOS)
-                         let color = Color(.windowBackgroundColor)
+                        let color = Color(.windowBackgroundColor)
 #else
-                         let color = Color(.systemBackground)
+                        let color = Color(.systemBackground)
 #endif
-                         VStack(spacing: 0) {
-                             color
-                                 .mask(
+                        VStack(spacing: 0) {
+                            color
+                                .mask(
                                     LinearGradient(
                                         gradient: Gradient(colors: [.clear, .black]),
                                         startPoint: .top,
                                         endPoint: .bottom
                                     )
-                                 )
-                                 .frame(height: 40) // same as top padding
-                             color
-                         }
-                         .edgesIgnoringSafeArea(.bottom)
-                     }
-                 }
+                                )
+                                .frame(height: 40) // same as top padding
+                            color
+                        }
+                        .edgesIgnoringSafeArea(.bottom)
+                    }
+                }
             }
         }
         .sheet(
@@ -243,9 +374,9 @@ private extension WhatsNewView {
         }
         .accessibilityElement(children: .combine)
         /*.transition(.asymmetric(
-            insertion: .move(edge: .trailing), // Enters from the right
-            removal: .move(edge: .leading)    // Exits towards the left
-        ))*/
+         insertion: .move(edge: .trailing), // Enters from the right
+         removal: .move(edge: .leading)    // Exits towards the left
+         ))*/
         .transition(.slideHorizontally)
         .frame(maxWidth: .infinity)
     }
@@ -374,7 +505,7 @@ private extension WhatsNewView {
     }
     func dismiss() {
         withAnimation {
-            self.presentationMode.wrappedValue.dismiss()
+            dismissSheet()
         }
     }
 }
@@ -399,7 +530,7 @@ private extension WhatsNewView {
     ])
     Text("YAY")
         .sheet(whatsNew: $whatsNew)
-    #if os(macOS)
+#if os(macOS)
         .frame(minWidth: 500, minHeight:  500)
-    #endif
+#endif
 }
