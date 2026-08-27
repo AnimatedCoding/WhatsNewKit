@@ -116,10 +116,11 @@ extension WhatsNewView: View {
                                 .padding(.top, isScrolled ? 20 : 40)
                                 .transition(.scale)
                                 .scaleEffect(isScrolled ? CGSize(width: 0.5, height: 0.5) : CGSize(width: 1, height: 1))
-                                .animation(.easeInOut, value: isScrolled)
+                                .animation(.bouncy, value: isScrolled)
                             //.frame(maxWidth: .infinity)
                         })
                     }
+                    .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
                     .toolbarTitleDisplayMode(.inlineLarge)
 #endif
                     // ScrollView bottom content inset
@@ -526,6 +527,14 @@ private extension WhatsNewView {
             .init(systemName: "a.book.closed.ja", title: "Miku", subtitle: "", foregroundStyle: .pink),
             .init(systemName: "star", title: "Miku", subtitle: "", foregroundStyle: .pink),
             .init(systemName: "pencil", title: "Beam", subtitle: "☆", foregroundStyle: .pink),
+            .init {
+                VStack(alignment: .leading) {
+                    Text("And now its time for the moment you've been waiting for...1...2...3...Ready? Miku Miku Beam!")
+                    Text("Keep going!")
+                        .font(.caption)
+                }
+                .foregroundStyle(.black)
+            },
         ]),
     ])
     Text("YAY")
