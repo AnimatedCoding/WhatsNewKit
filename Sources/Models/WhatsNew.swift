@@ -8,10 +8,10 @@ public struct WhatsNew {
     // MARK: Properties
     
     /// The Version
-    public var version: Version
+    //public var version: Version
     
     /// The Title
-    public var title: Title
+    public var title: String
     
     /// The Features
     public var featureGroups: [FeatureGroup]
@@ -29,18 +29,16 @@ public struct WhatsNew {
     ///   - primaryAction: The PrimaryAction. Default value `.init()`
     ///   - secondaryAction: The optional SecondaryAction. Default value `nil`
     public init(
-        version: Version = .current(),
-        title: Title,
-        features: [Feature],
+        //version: Version = .current(),
+        title: String,
+        features: [WhatsNew.WhatsNewFeature],
         primaryAction: PrimaryAction = .init(),
         secondaryAction: SecondaryAction? = nil
     ) {
-        self.version = version
+        //self.version = version
         self.title = title
         self.featureGroups = [FeatureGroup(feature: features, action: primaryAction, secondaryAction: secondaryAction)]
-        if !featureGroups.isEmpty {
-            self.selectedFeature = featureGroups[0]
-        }
+        self.selectedFeature = featureGroups[0]
     }
     /// Creates a new instance of `WhatsNew` using `FeatureGroup`
     /// - Parameters:
@@ -48,11 +46,11 @@ public struct WhatsNew {
     ///   - title: The Title
     ///   - featuresGroups: The FeaturesGroups
     public init(
-        version: Version = .current(),
-        title: Title,
+        //version: Version = .current(),
+        title: String,
         featureGroups: [FeatureGroup],
     ) {
-        self.version = version
+        //self.version = version
         self.title = title
         self.featureGroups = featureGroups
         if !featureGroups.isEmpty {
@@ -63,11 +61,11 @@ public struct WhatsNew {
 
 // MARK: - Identifiable
 
-extension WhatsNew: Identifiable {
-    
-    /// The stable identity of the entity associated with this instance.
-    public var id: Version {
-        self.version
-    }
-    
-}
+//extension WhatsNew: Identifiable {
+//    
+//    /// The stable identity of the entity associated with this instance.
+//    public var id: Version {
+//        self.version
+//    }
+//    
+//}

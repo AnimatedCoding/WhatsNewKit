@@ -5,12 +5,12 @@ import SwiftUI
 public extension WhatsNew {
     
     /// The WhatsNew SecondaryAction
-    struct SecondaryAction {
+    struct SecondaryAction: Equatable {
         
         // MARK: Properties
         
         /// The title Text
-        public var title: Text
+        public var title: String
         
         /// The foreground color
         public var foregroundColor: Color
@@ -21,6 +21,8 @@ public extension WhatsNew {
         /// The Action
         public var action: Action
         
+        public var id = UUID()
+        
         // MARK: Initializer
         
         /// Creates a new instance of `WhatsNew.PrimaryAction`
@@ -30,7 +32,7 @@ public extension WhatsNew {
         ///   - hapticFeedback: The optional HapticFeedback. Default value `nil`
         ///   - action: The Action
         public init(
-            title: Text,
+            title: String,
             foregroundColor: Color = {
                 #if os(visionOS)
                 .primary
@@ -47,6 +49,8 @@ public extension WhatsNew {
             self.action = action
         }
         
+        public static func ==(lhs: Self, rhs: Self) -> Bool {
+            lhs.id == rhs.id
+        }
     }
-    
 }

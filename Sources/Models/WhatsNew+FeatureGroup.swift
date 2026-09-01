@@ -2,9 +2,9 @@ import Foundation
 
 public extension WhatsNew {
     /// The struct representing a group of feature that apear on the same screen
-    struct FeatureGroup {
+    struct FeatureGroup: Equatable {
         /// The list of `Feature`
-        public var features: [Feature]
+        public var features: [WhatsNew.WhatsNewFeature]
         /// The ondismiss
         public var primaryAction: PrimaryAction
         /// The optional SecondaryAction
@@ -15,7 +15,7 @@ public extension WhatsNew {
         ///   - features: An `Array` of features
         ///   - action: The `PrimaryAction` that the main button calls
         ///   - secondaryAction: The optional `SecondaryAction`
-        public init(feature: [Feature],
+        public init(feature: [WhatsNew.WhatsNewFeature],
                     action: PrimaryAction = PrimaryAction(action: FeatureGroup.defaultAction),
                     secondaryAction: SecondaryAction? = nil
         ) {

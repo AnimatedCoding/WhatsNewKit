@@ -9,15 +9,15 @@ public struct WhatsNewView {
     
     @Environment(\.dismiss) private var dismissSheet
     
-    @State private var top: WhatsNew.Feature?
+    @State private var top: WhatsNew.WhatsNewFeature?
     
     /// The current `FeatureGroup`
     @State public var groupIndex: Int? = nil
     /// The WhatsNew object
-    @State private var whatsNew: WhatsNew
+    @Binding var whatsNew: WhatsNew
     
     /// The WhatsNewVersionStore
-    private let whatsNewVersionStore: WhatsNewVersionStore?
+    //private let whatsNewVersionStore: WhatsNewVersionStore?
     
     /// The WhatsNew Layout
     private let layout: WhatsNew.Layout
@@ -38,15 +38,15 @@ public struct WhatsNewView {
     ///   - versionStore: The optional WhatsNewVersionStore. Default value `nil`
     ///   - layout: The WhatsNew Layout. Default value `.default`
     public init(
-        whatsNew: WhatsNew,
-        versionStore: WhatsNewVersionStore? = nil,
+        whatsNew: Binding<WhatsNew>,
+        //versionStore: WhatsNewVersionStore? = nil,
         layout: WhatsNew.Layout = .default
     ) {
-        self.whatsNew = whatsNew
-        self.whatsNewVersionStore = versionStore
+        self._whatsNew = whatsNew
+        //self.whatsNewVersionStore = versionStore
         self.layout = layout
         if let groupIndex {
-            top = whatsNew.featureGroups[groupIndex].features.first
+            top = whatsNew.wrappedValue.featureGroups[groupIndex].features.first
         }
     }
     /// Sets the `WhatsNew.selectedFeature` to the first in `WhatsNew.featureGroups`
@@ -66,25 +66,24 @@ extension WhatsNewView: View {
                     showsIndicators: self.layout.showsScrollViewIndicators
                 ) {
                     //                // Content Stack
-                    VStack(
+                    LazyVStack(
                         spacing: self.layout.contentSpacing
                     ) {
                         // Title
 #if os(iOS) && !targetEnvironment(macCatalyst)
 #else
                         self.title
-                            .transition(.slide)
                             .frame(maxWidth: .infinity)
 #endif
                         // Feature List
-                        VStack(
+                        LazyVStack(
                             alignment: .leading,
                             spacing: self.layout.featureListSpacing
                         ) {
                             // Feature
                             ForEach(
-                                self.whatsNew.selectedFeature?.features ?? [],
-                                id: \.self,
+                                self.whatsNew.selectedFeature?.features ?? Array<WhatsNew.WhatsNewFeature>(),
+                                id: \.id,
                                 content: self.feature
                             )
                             
@@ -130,8 +129,14 @@ extension WhatsNewView: View {
                             self.layout.scrollViewBottomContentInset
                         )
                 }
-                .onScrollTargetVisibilityChange(idType: WhatsNew.Feature.self, { visible in
-                    top = visible.first
+                //.padding(.top)
+                //.ignoresSafeArea(edges: .top)
+                .onScrollTargetVisibilityChange(idType: WhatsNew.WhatsNewFeature.self, { visible in
+                    let newTop = visible.first
+                    guard newTop != top else { return }
+                    withAnimation {
+                        top = newTop
+                    }
                 })
 #if targetEnvironment(macCatalyst)
                 .background {
@@ -189,7 +194,6 @@ extension WhatsNewView: View {
                     ) {
                         // Title
                         self.title
-                            .transition(.slide)
                             .frame(maxWidth: .infinity)
                         // Feature List
                         VStack(
@@ -262,19 +266,20 @@ extension WhatsNewView: View {
                 }
             }
         }
+        .transition(.slide)
         .sheet(
             item: self.$secondaryActionPresentedView,
             content: { $0.view }
         )
-        .onDisappear {
-            // Save presented WhatsNew Version, if available
-            self.whatsNewVersionStore?.save(
-                presentedVersion: self.whatsNew.version
-            )
-        }
+//        .onDisappear {
+//            // Save presented WhatsNew Version, if available
+//            self.whatsNewVersionStore?.save(
+//                presentedVersion: self.whatsNew.version
+//            )
+//        }
         .onAppear {
             if whatsNew.selectedFeature != nil {
-                groupIndex = 0
+                groupIndex = whatsNew.featureGroups.firstIndex(where: { $0 == whatsNew.selectedFeature }) ?? 0
             }
         }
     }
@@ -286,9 +291,7 @@ private extension WhatsNewView {
     
     /// The Title View
     var title: some View {
-        Text(
-            whatsNewText: self.whatsNew.title.text
-        )
+        Text(self.whatsNew.title)
         .font(.largeTitle.bold())
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
@@ -303,122 +306,139 @@ private extension WhatsNewView {
     /// The Feature View
     /// - Parameter feature: A WhatsNew Feature
     func feature(
-        _ feature: WhatsNew.Feature
+        _ feature: WhatsNew.WhatsNewFeature
     ) -> some View {
         VStack {
-            if let feature = feature.feature {
-                /// If the `Feature` is using `Default` present the default view style
-                HStack(
-                    alignment: self.layout.featureHorizontalAlignment,
-                    spacing: self.layout.featureHorizontalSpacing
-                ) {
-                    if self.layout.featureSidewaysAlignment == .trailing {
-                        Spacer()
-                    }
+            switch feature {
+            case .default(var feature):
+                let bind = Binding<WhatsNewFeature>(get: {
                     feature
-                        .image
-                        .view()
-                        .frame(width: self.layout.featureImageWidth)
-                    VStack(
-                        alignment: .leading,
-                        spacing: self.layout.featureVerticalSpacing
-                    ) {
-                        Text(
-                            whatsNewText: feature.title
-                        )
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.primary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        Text(
-                            whatsNewText: feature.subtitle
-                        )
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .multilineTextAlignment(.leading)
-                    if self.layout.featureSidewaysAlignment == .leading {
-                        Spacer()
-                    }
-                }
-            } else if let customViewBuilder = feature.customViewBuilder {
-                /// Present a custom view
-                if feature.useDefaultStyling {
-                    customViewBuilder()
+                }, set: {
+                    feature = $0
+                })
+                FeatureView(feature: bind)
+//                HStack(
+//                    alignment: self.layout.featureHorizontalAlignment,
+//                    spacing: self.layout.featureHorizontalSpacing
+//                ) {
+//                    if self.layout.featureSidewaysAlignment == .trailing {
+//                        Spacer()
+//                    }
+//                    feature
+//                        .image
+//                        .view()
+//                        .frame(width: self.layout.featureImageWidth)
+//                    VStack(
+//                        alignment: .leading,
+//                        spacing: self.layout.featureVerticalSpacing
+//                    ) {
+//                        Text(
+//                            whatsNewText: feature.title
+//                        )
+//                        .font(.subheadline.weight(.semibold))
+//                        .foregroundColor(.primary)
+//                        .fixedSize(horizontal: false, vertical: true)
+//                        Text(
+//                            whatsNewText: feature.subtitle
+//                        )
+//                        .font(.subheadline)
+//                        .foregroundColor(.secondary)
+//                        .fixedSize(horizontal: false, vertical: true)
+//                    }
+//                    .multilineTextAlignment(.leading)
+//                    if self.layout.featureSidewaysAlignment == .leading {
+//                        Spacer()
+//                    }
+//                }
+            case .custom(let custom):
+                if custom.useDefaultStyling {
+                    custom.viewBuilder()
                         .multilineTextAlignment(.leading)
                         .environment(\.whatsNewLayout, self.layout)
                 } else {
-                    customViewBuilder()
-                }
-            } else {
-                /// If there is no feature or custom view
-                VStack {
-                    if #available(iOS 17.0, macOS 14.0, *) {
-                        ContentUnavailableView("Error, there was no onboarding view", image: "exclamationmark.triangle.text.page.fill",
-                                               description: Text("Contact the developer if this error persists"))
-                    } else {
-                        if #available(iOS 14.0, *) {
-                            Label("Error, there was no onboarding view", systemImage: "exclamationmark.triangle.text.page.fill")
-                        } else {
-                            HStack {
-                                Text("Error, there was no onboarding view")
-                                Image(systemName: "exclamationmark.triangle.text.page.fill")
-                            }
-                        }
-                        Text("Contact the developer if this error persists")
-                    }
-                }
-                .onAppear {
-                    print("There was nether a feature, nor a custom view, so this view could not be rendered")
+                    custom.viewBuilder()
                 }
             }
+//            if let feature = feature.feature {
+//                
+//            } else if let customViewBuilder = feature.customViewBuilder {
+//                /// Present a custom view
+//                if feature.useDefaultStyling {
+//                    customViewBuilder()
+//                        .multilineTextAlignment(.leading)
+//                        .environment(\.whatsNewLayout, self.layout)
+//                } else {
+//                    customViewBuilder()
+//                }
+//            } else {
+//                /// If there is no feature or custom view
+//                VStack {
+//                    if #available(iOS 17.0, macOS 14.0, *) {
+//                        ContentUnavailableView("Error, there was no onboarding view", image: "exclamationmark.triangle.text.page.fill",
+//                                               description: Text("Contact the developer if this error persists"))
+//                    } else {
+//                        if #available(iOS 14.0, *) {
+//                            Label("Error, there was no onboarding view", systemImage: "exclamationmark.triangle.text.page.fill")
+//                        } else {
+//                            HStack {
+//                                Text("Error, there was no onboarding view")
+//                                Image(systemName: "exclamationmark.triangle.text.page.fill")
+//                            }
+//                        }
+//                        Text("Contact the developer if this error persists")
+//                    }
+//                }
+//                .onAppear {
+//                    print("There was nether a feature, nor a custom view, so this view could not be rendered")
+//                }
+//            }
         }
         .accessibilityElement(children: .combine)
         /*.transition(.asymmetric(
          insertion: .move(edge: .trailing), // Enters from the right
          removal: .move(edge: .leading)    // Exits towards the left
          ))*/
-        .transition(.slideHorizontally)
+//        .transition(.slideHorizontally)
         .frame(maxWidth: .infinity)
     }
     
 }
 
-/// Used for custom slide transition
-extension AnyTransition {
-    static var slideHorizontally: AnyTransition {
-#if os(macOS)
-        .asymmetric(
-            insertion: .modifier(
-                active: OffsetModifier(x: NSScreen.main?.frame.width ?? 0),
-                identity: OffsetModifier(x: 0)
-            ),
-            removal: .modifier(
-                active: OffsetModifier(x: -(NSScreen.main?.frame.width ?? 0)),
-                identity: OffsetModifier(x: 0)
-            )
-        )
-#else
-        .asymmetric(
-            insertion: .modifier(
-                active: OffsetModifier(x: UIScreen.main.bounds.width),
-                identity: OffsetModifier(x: 0)
-            ),
-            removal: .modifier(
-                active: OffsetModifier(x: -UIScreen.main.bounds.width),
-                identity: OffsetModifier(x: 0)
-            )
-        )
-#endif
-    }
-}
+///// Used for custom slide transition
+//extension AnyTransition {
+//    static var slideHorizontally: AnyTransition {
+//#if os(macOS)
+//        .asymmetric(
+//            insertion: .modifier(
+//                active: OffsetModifier(x: NSScreen.main?.frame.width ?? 0),
+//                identity: OffsetModifier(x: 0)
+//            ),
+//            removal: .modifier(
+//                active: OffsetModifier(x: -(NSScreen.main?.frame.width ?? 0)),
+//                identity: OffsetModifier(x: 0)
+//            )
+//        )
+//#else
+//        .asymmetric(
+//            insertion: .modifier(
+//                active: OffsetModifier(x: UIScreen.main.bounds.width),
+//                identity: OffsetModifier(x: 0)
+//            ),
+//            removal: .modifier(
+//                active: OffsetModifier(x: -UIScreen.main.bounds.width),
+//                identity: OffsetModifier(x: 0)
+//            )
+//        )
+//#endif
+//    }
+//}
 
-struct OffsetModifier: ViewModifier {
-    let x: CGFloat
-    func body(content: Content) -> some View {
-        content.offset(x: x)
-    }
-}
+//struct OffsetModifier: ViewModifier {
+//    let x: CGFloat
+//    func body(content: Content) -> some View {
+//        content.offset(x: x)
+//    }
+//}
 
 // MARK: - Footer
 
@@ -447,9 +467,7 @@ private extension WhatsNewView {
                         }
                     }
                 ) {
-                    Text(
-                        whatsNewText: secondaryAction.title
-                    )
+                    Text(secondaryAction.title)
                 }
 #if os(macOS)
                 .buttonStyle(
@@ -468,9 +486,7 @@ private extension WhatsNewView {
                 ) {
                     HStack {
                         Spacer()
-                        Text(
-                            whatsNewText:primaryAction.title
-                        )
+                        Text(primaryAction.title)
                         .font(.headline.weight(.semibold))
                         Spacer()
                     }
@@ -513,33 +529,66 @@ private extension WhatsNewView {
 
 @available(iOS 17, macOS 14, *)
 #Preview {
-    @Previewable @State var whatsNew: WhatsNew? = WhatsNew(title: "PPPP", featureGroups: [
-        .init(feature: [
-            .init(systemName: "richtext.page.ja", title: "Yay", subtitle: "TAK", foregroundStyle: .red),
-            .init(systemName: "pencil", title: "🍡🍡🍡", subtitle: "", foregroundStyle: .orange),
-            .init(systemName: "pencil", title: "Yay", subtitle: "", foregroundStyle: .yellow),
-            .init(systemName: "pencil", title: "Yay", subtitle: "t", foregroundStyle: .green),
-            .init(systemName: "pencil", title: "P", subtitle: "a", foregroundStyle: .cyan),
-            .init(systemName: "pencil", title: "P", subtitle: "k", foregroundStyle: .blue),
-            .init(systemName: "formfitting.gamecontroller.fill", title: "P", subtitle: "", foregroundStyle: .purple),
-            .init(systemName: "pencil", title: "P", subtitle: "", foregroundStyle: .pink),
-            .init(systemName: "pencil", title: "Hay", subtitle: "", foregroundStyle: .red),
-            .init(systemName: "a.book.closed.ja", title: "Miku", subtitle: "", foregroundStyle: .pink),
-            .init(systemName: "star", title: "Miku", subtitle: "", foregroundStyle: .pink),
-            .init(systemName: "pencil", title: "Beam", subtitle: "☆", foregroundStyle: .pink),
-            .init {
-                VStack(alignment: .leading) {
-                    Text("And now its time for the moment you've been waiting for...1...2...3...Ready? Miku Miku Beam!")
-                    Text("Keep going!")
-                        .font(.caption)
+    PreviewViewYay()
+}
+
+struct PreviewViewYay: View {
+    @State var yays = 1
+    @State var show = true
+    @State var whatsNew: WhatsNew?
+    var body: some View {
+        Text("YAY")
+            .onAppear {
+                whatsNew = WhatsNew(title: "PPPP", featureGroups: [
+                    .init(feature: [
+                        .default(Default(systemName: "richtext.page.ja", title: String(repeating: "Yay", count: yays), subtitle: "TAK", foregroundStyle: .red)),
+                        .default(Default(systemName: "richtext.page.ja", title: "This is a long title that is for testing purposes only", subtitle: "TAKTAKTAKTAKTAKTAKTAKTAKTAKTAK", foregroundStyle: .red)),
+                        .default(Default(systemName: "pencil", title: "🍡🍡🍡", subtitle: "", foregroundStyle: .orange)),
+                        .default(Default(systemName: "pencil", title: "Yay", subtitle: "", foregroundStyle: .yellow)),
+                        .default(Default(systemName: "pencil", title: "Yay", subtitle: "t", foregroundStyle: .green)),
+                        .default(Default(systemName: "pencil", title: "P", subtitle: "a", foregroundStyle: .cyan)),
+                        .default(Default(systemName: "pencil", title: "P", subtitle: "k", foregroundStyle: .blue)),
+                        .default(Default(systemName: "formfitting.gamecontroller.fill", title: "P", subtitle: "", foregroundStyle: .purple)),
+                        .default(Default(systemName: "pencil", title: "P", subtitle: "", foregroundStyle: .pink)),
+                        .default(Default(systemName: "pencil", title: "Hay", subtitle: "", foregroundStyle: .red)),
+                        .default(Default(systemName: "a.book.closed.ja", title: "Miku", subtitle: "", foregroundStyle: .pink)),
+                        .default(Default(systemName: "star", title: "Miku", subtitle: "", foregroundStyle: .pink)),
+                        .default(Default(systemName: "pencil", title: "Beam", subtitle: "☆", foregroundStyle: .pink)),
+                        .custom(Custom {
+                            mikumikubeam
+                        }),
+                    ]),
+                ])
+            }
+            .sheet(whatsNew: $whatsNew)
+    #if os(macOS)
+            .frame(minWidth: 500, minHeight:  500)
+    #endif
+    }
+    var mikumikubeam: some View {
+        VStack(alignment: .leading) {
+            Text("And now its time for the moment you've been waiting for...1...2...3...Ready? Miku Miku Beam!")
+            Button(action: {
+                print("Executing", yays)
+                yays += 1
+                if let wn = whatsNew {
+                    switch wn.featureGroups[0].features[0] {
+                    case .default(var feature):
+                        feature.title = String(repeating: "Yay", count: yays)
+                    case .custom(_):
+                        break
+                    }
+                    whatsNew = wn
                 }
-                .foregroundStyle(.black)
-            },
-        ]),
-    ])
-    Text("YAY")
-        .sheet(whatsNew: $whatsNew)
-#if os(macOS)
-        .frame(minWidth: 500, minHeight:  500)
-#endif
+
+            }) {
+                Text("Keep going!")
+                    .font(.caption)
+            }
+            .buttonStyle(.plain)
+            Text("yays: \(yays.description)")
+                .font(.caption)
+        }
+        .foregroundStyle(.black)
+    }
 }

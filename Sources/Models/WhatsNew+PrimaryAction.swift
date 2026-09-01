@@ -5,12 +5,12 @@ import SwiftUI
 public extension WhatsNew {
     
     /// The WhatsNew PrimaryAction
-    struct PrimaryAction {
+    struct PrimaryAction: Equatable {
         
         // MARK: Properties
         
         /// The title Text
-        public var title: Text
+        public var title: String
         
         /// The background color
         public var backgroundColor: Color
@@ -19,10 +19,12 @@ public extension WhatsNew {
         public var foregroundColor: Color
         
         /// The optional HapticFeedback
-        public var hapticFeedback: HapticFeedback?
+        //public var hapticFeedback: HapticFeedback?
         
         /// The optional on dismiss closure
         public var action: ((_ progress: () -> Void, _ dismiss: () -> Void) -> Void)?
+        
+        public var id = UUID()
         
         // MARK: Initializer
         
@@ -34,7 +36,7 @@ public extension WhatsNew {
         ///   - hapticFeedback: The optional HapticFeedback. Default value `nil`
         ///   - onDismiss: The optional on dismiss closure. Default value `nil`
         public init(
-            title: Text = "Continue",
+            title: String = "Continue",
             backgroundColor: Color = .accentColor,
             foregroundColor: Color = .white,
             hapticFeedback: HapticFeedback? = nil,
@@ -43,10 +45,13 @@ public extension WhatsNew {
             self.title = title
             self.backgroundColor = backgroundColor
             self.foregroundColor = foregroundColor
-            self.hapticFeedback = hapticFeedback
+            //self.hapticFeedback = hapticFeedback
             self.action = action
         }
         
+        public static func ==(lhs: Self, rhs: Self) -> Bool {
+            lhs.id == rhs.id
+        }
     }
     
 }
