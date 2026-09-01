@@ -7,9 +7,6 @@ protocol Feature: Equatable, Hashable {
 }
 
 public extension WhatsNew {
-    
-    
-
     enum WhatsNewFeature: Feature {
         case `default`(Default)
         case custom(Custom)
@@ -40,75 +37,13 @@ public extension WhatsNew {
             }
         }
     }
-    /// A WhatsNew Feature
-//    struct Feature {
-//        
-//        // MARK: Properties
-//        
-//        /// The default feature
-//        var feature: Default?
-//        
-//        /// For custom SwiftUI views
-//        let customViewBuilder: (() -> AnyView)?
-//        
-//        var useDefaultStyling: Bool = true
-//        
-//        var id = UUID()
-//        
-//        // MARK: Initializers
-//        
-//        /// Creates a new instance of `WhatsNew.Feature` using the `Default` method
-//        /// - Parameters:
-//        ///   - image: The image
-//        ///   - title: The title Text
-//        ///   - subtitle: The subtitle Text
-//        public init(
-//            image: Image,
-//            title: String,
-//            subtitle: String
-//        ) {
-//            self.feature = Default(image: image, title: title, subtitle: subtitle)
-//            self.customViewBuilder = nil
-//        }
-//
-//        /// Creates a new instance of `WhatsNew.Feature` using the `Default` method, but accept string peramiters
-//        /// - Parameters:
-//        ///   - image: The system image name (String)
-//        ///   - title: The title String
-//        ///   - subtitle: The subtitle String
-//        public init(
-//            systemName: String,
-//            title: String,
-//            subtitle: String,
-//            foregroundStyle: Color? = .accentColor,
-//        ) {
-//            self.feature = Default(image: .init(systemName: systemName, foregroundColor: foregroundStyle), title: title, subtitle: subtitle)
-//            self.customViewBuilder = nil
-//        }
-//        
-//        /// Creates a new instance of `WhatsNew.Feature` in custom view mode
-//        ///  - Parameters:
-//        ///   - customView: The SwiftUI view that should be presented
-//        ///   - useDefaultStyling: This sets the button style to be the same as the main action button, it defaults to `true`
-//        public init<Content: View>(
-//            @ViewBuilder customView: @escaping () -> Content,
-//            useDefaultStyling: Bool = true,
-//            foregroundStyle: Color = .accentColor,
-//        ) {
-//            self.feature = nil
-//            self.customViewBuilder = { AnyView(
-//                customView()
-//                    .foregroundStyle(foregroundStyle)
-//            ) }
-//            self.useDefaultStyling = useDefaultStyling
-//        }
-    //}
 }
 
 extension WhatsNew.WhatsNewFeature {
     
     /// Representing a default `Feature` (`WhatsNew.Feature.Default`)``
-    public struct Default: Feature {
+    @Observable
+    public class Default: Feature {
         public let id = UUID()
         
         // MARK: Properties
@@ -148,6 +83,10 @@ extension WhatsNew.WhatsNewFeature {
             hasher.combine(subtitle)
             hasher.combine(image)
         }
+        
+        public static func ==(lhs: Default, rhs: Default) -> Bool {
+            lhs.image == rhs.image && lhs.title == rhs.title && lhs.subtitle == rhs.subtitle && lhs.foregroundStyle == rhs.foregroundStyle
+        }
     }
 }
 
@@ -156,7 +95,8 @@ typealias Default = WhatsNew.WhatsNewFeature.Default
 extension WhatsNew.WhatsNewFeature {
     
     /// Representing a default `Feature` (`WhatsNew.Feature.Default`)``
-    public struct Custom: Feature {
+    @Observable
+    public class Custom: Feature {
         public let id = UUID()
         
         let viewBuilder: (() -> AnyView)
@@ -175,10 +115,7 @@ extension WhatsNew.WhatsNewFeature {
             self.useDefaultStyling = useDefaultStyling
         }
         
-        public static func == (
-            lhs: Self,
-            rhs: Self
-        ) -> Bool {
+        public static func == (lhs: Custom, rhs: Custom) -> Bool {
             lhs.id == rhs.id
         }
         
@@ -191,39 +128,3 @@ extension WhatsNew.WhatsNewFeature {
 }
 
 typealias Custom = WhatsNew.WhatsNewFeature.Custom
-// MARK: - Feature+Equatable
-//
-//extension WhatsNew.Feature: Equatable {
-//    
-//    /// Returns a Boolean value indicating whether two values are equal.
-//    /// - Parameters:
-//    ///   - lhs: A value to compare.
-//    ///   - rhs: Another value to compare.
-//    public static func == (
-//        lhs: Self,
-//        rhs: Self
-//    ) -> Bool {
-//        lhs.id == rhs.id
-//    }
-//    
-//}
-//
-//// MARK: - Feature+Hashable
-//
-//extension WhatsNew.Feature: Hashable {
-//    
-//    /// Hashes the essential components of this value by feeding them into the given hasher.
-//    /// - Parameter hasher: The hasher to use when combining the components of this instance.
-//    public func hash(
-//        into hasher: inout Hasher
-//    ) {
-//        if let d = self.feature {
-//            hasher.combine(d.title)
-//            hasher.combine(d.subtitle)
-//            hasher.combine(d.image.id)
-//        } else {
-//            hasher.combine(self.id)
-//        }
-//    }
-//    
-//}

@@ -3,7 +3,8 @@ import Foundation
 // MARK: - WhatsNew
 
 /// A WhatsNew object
-public struct WhatsNew {
+@Observable
+public class WhatsNew: Equatable {
     
     // MARK: Properties
     
@@ -56,6 +57,10 @@ public struct WhatsNew {
         if !featureGroups.isEmpty {
             self.selectedFeature = featureGroups[0]
         }
+    }
+    
+    public static func ==(lhs: WhatsNew, rhs: WhatsNew) -> Bool {
+        lhs.title == rhs.title && lhs.featureGroups == rhs.featureGroups
     }
 }
 

@@ -5,7 +5,8 @@ import SwiftUI
 public extension WhatsNew {
     
     /// The WhatsNew PrimaryAction
-    struct PrimaryAction: Equatable {
+    @Observable
+    class PrimaryAction: Equatable {
         
         // MARK: Properties
         
@@ -49,7 +50,7 @@ public extension WhatsNew {
             self.action = action
         }
         
-        public static func ==(lhs: Self, rhs: Self) -> Bool {
+        public static func ==(lhs: PrimaryAction, rhs: PrimaryAction) -> Bool {
             lhs.id == rhs.id
         }
     }

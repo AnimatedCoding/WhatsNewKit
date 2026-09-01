@@ -2,7 +2,8 @@ import Foundation
 
 public extension WhatsNew {
     /// The struct representing a group of feature that apear on the same screen
-    struct FeatureGroup: Equatable {
+    @Observable
+    class FeatureGroup: Equatable {
         /// The list of `Feature`
         public var features: [WhatsNew.WhatsNewFeature]
         /// The ondismiss
@@ -24,8 +25,11 @@ public extension WhatsNew {
             self.secondaryAction = secondaryAction
         }
         /// The default action
-        static public func defaultAction(_ c: () -> Void, _ d: () -> Void) {
+        public static func defaultAction(_ c: () -> Void, _ d: () -> Void) {
             c()
+        }
+        public static func ==(lhs: FeatureGroup, rhs: FeatureGroup) -> Bool {
+            lhs.features == rhs.features && lhs.primaryAction == rhs.primaryAction && lhs.secondaryAction == rhs.secondaryAction
         }
     }
 }

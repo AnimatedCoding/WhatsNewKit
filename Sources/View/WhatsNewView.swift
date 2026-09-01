@@ -3,60 +3,29 @@ import SwiftUI
 // MARK: - WhatsNewView
 
 /// A WhatsNewView
-public struct WhatsNewView {
+public struct WhatsNewView: View {
     
     // MARK: Properties
     
     @Environment(\.dismiss) private var dismissSheet
     
-    @State private var top: WhatsNew.WhatsNewFeature?
+    @State private var top: UUID?
     
     /// The current `FeatureGroup`
     @State public var groupIndex: Int? = nil
-    /// The WhatsNew object
-    @Binding var whatsNew: WhatsNew
     
-    /// The WhatsNewVersionStore
-    //private let whatsNewVersionStore: WhatsNewVersionStore?
+    /// The WhatsNew object
+    @Bindable var whatsNew: WhatsNew
     
     /// The WhatsNew Layout
-    private let layout: WhatsNew.Layout
+    let layout: WhatsNew.Layout
     
     /// The View that is presented by the SecondaryAction
-    @State
-    private var secondaryActionPresentedView: WhatsNew.SecondaryAction.Action.PresentedView?
+    @State private var secondaryActionPresentedView: WhatsNew.SecondaryAction.Action.PresentedView?
     
     /// The PresentationMode
-    @Environment(\.presentationMode)
-    private var presentationMode
+    @Environment(\.presentationMode) private var presentationMode
     
-    // MARK: Initializer
-    
-    /// Creates a new instance of `WhatsNewView`
-    /// - Parameters:
-    ///   - whatsNew: The WhatsNew object
-    ///   - versionStore: The optional WhatsNewVersionStore. Default value `nil`
-    ///   - layout: The WhatsNew Layout. Default value `.default`
-    public init(
-        whatsNew: Binding<WhatsNew>,
-        //versionStore: WhatsNewVersionStore? = nil,
-        layout: WhatsNew.Layout = .default
-    ) {
-        self._whatsNew = whatsNew
-        //self.whatsNewVersionStore = versionStore
-        self.layout = layout
-        if let groupIndex {
-            top = whatsNew.wrappedValue.featureGroups[groupIndex].features.first
-        }
-    }
-    /// Sets the `WhatsNew.selectedFeature` to the first in `WhatsNew.featureGroups`
-}
-
-// MARK: - View
-
-extension WhatsNewView: View {
-    
-    /// The content and behavior of the view.
     public var body: some View {
         NavigationStack {
             // Content ScrollView
@@ -81,11 +50,30 @@ extension WhatsNewView: View {
                             spacing: self.layout.featureListSpacing
                         ) {
                             // Feature
-                            ForEach(
-                                self.whatsNew.selectedFeature?.features ?? Array<WhatsNew.WhatsNewFeature>(),
-                                id: \.id,
-                                content: self.feature
-                            )
+                            ForEach(self.whatsNew.selectedFeature?.features ?? Array<WhatsNew.WhatsNewFeature>(), id: \.id) { feature in
+                                VStack {
+                                    switch feature {
+                                    case .default(var feature):
+                                        let bind = Binding<WhatsNewFeature>(get: {
+                                            feature
+                                        }, set: {
+                                            feature = $0
+                                        })
+                                        FeatureView(feature: bind)
+                                    case .custom(let custom):
+                                        if custom.useDefaultStyling {
+                                            custom.viewBuilder()
+                                                .multilineTextAlignment(.leading)
+                                                .environment(\.whatsNewLayout, self.layout)
+                                        } else {
+                                            custom.viewBuilder()
+                                        }
+                                    }
+                                }
+                                .accessibilityElement(children: .combine)
+                                .frame(maxWidth: .infinity)
+                                .id(feature.id)
+                            }
                             
                         }
                         .scrollTargetLayout()
@@ -105,7 +93,7 @@ extension WhatsNewView: View {
 #if os(iOS) && !targetEnvironment(macCatalyst)
                     .toolbar {
                         var isScrolled: Bool {
-                            if let groupIndex, top == whatsNew.featureGroups[groupIndex].features.first {
+                            if let groupIndex, top == whatsNew.featureGroups[groupIndex].features.first?.id {
                                 return false
                             }
                             return true
@@ -131,7 +119,7 @@ extension WhatsNewView: View {
                 }
                 //.padding(.top)
                 //.ignoresSafeArea(edges: .top)
-                .onScrollTargetVisibilityChange(idType: WhatsNew.WhatsNewFeature.self, { visible in
+                .onScrollTargetVisibilityChange(idType: UUID.self, { visible in
                     let newTop = visible.first
                     guard newTop != top else { return }
                     withAnimation {
@@ -182,6 +170,14 @@ extension WhatsNewView: View {
                         }
                     }
                 }
+                .onChange(of: whatsNew) {
+                    switch whatsNew.featureGroups.first?.features.first {
+                    case .default(let d):
+                        print(d.title)
+                    default:
+                        break
+                    }
+                }
             //MARK: -- Older
             } else {
                 ScrollView(
@@ -201,11 +197,29 @@ extension WhatsNewView: View {
                             spacing: self.layout.featureListSpacing
                         ) {
                             // Feature
-                            ForEach(
-                                self.whatsNew.selectedFeature?.features ?? [],
-                                id: \.self,
-                                content: self.feature
-                            )
+                            ForEach(self.whatsNew.selectedFeature?.features ?? [], id: \.self) { feature in
+                                VStack {
+                                    switch feature {
+                                    case .default(var feature):
+                                        let bind = Binding<WhatsNewFeature>(get: {
+                                            feature
+                                        }, set: {
+                                            feature = $0
+                                        })
+                                        FeatureView(feature: bind)
+                                    case .custom(let custom):
+                                        if custom.useDefaultStyling {
+                                            custom.viewBuilder()
+                                                .multilineTextAlignment(.leading)
+                                                .environment(\.whatsNewLayout, self.layout)
+                                        } else {
+                                            custom.viewBuilder()
+                                        }
+                                    }
+                                }
+                                .accessibilityElement(children: .combine)
+                                .frame(maxWidth: .infinity)
+                            }
                             
                         }
                         .modifier(FeaturesPadding())
@@ -271,12 +285,6 @@ extension WhatsNewView: View {
             item: self.$secondaryActionPresentedView,
             content: { $0.view }
         )
-//        .onDisappear {
-//            // Save presented WhatsNew Version, if available
-//            self.whatsNewVersionStore?.save(
-//                presentedVersion: self.whatsNew.version
-//            )
-//        }
         .onAppear {
             if whatsNew.selectedFeature != nil {
                 groupIndex = whatsNew.featureGroups.firstIndex(where: { $0 == whatsNew.selectedFeature }) ?? 0
@@ -298,147 +306,6 @@ private extension WhatsNewView {
     }
     
 }
-
-// MARK: - Feature
-
-private extension WhatsNewView {
-    
-    /// The Feature View
-    /// - Parameter feature: A WhatsNew Feature
-    func feature(
-        _ feature: WhatsNew.WhatsNewFeature
-    ) -> some View {
-        VStack {
-            switch feature {
-            case .default(var feature):
-                let bind = Binding<WhatsNewFeature>(get: {
-                    feature
-                }, set: {
-                    feature = $0
-                })
-                FeatureView(feature: bind)
-//                HStack(
-//                    alignment: self.layout.featureHorizontalAlignment,
-//                    spacing: self.layout.featureHorizontalSpacing
-//                ) {
-//                    if self.layout.featureSidewaysAlignment == .trailing {
-//                        Spacer()
-//                    }
-//                    feature
-//                        .image
-//                        .view()
-//                        .frame(width: self.layout.featureImageWidth)
-//                    VStack(
-//                        alignment: .leading,
-//                        spacing: self.layout.featureVerticalSpacing
-//                    ) {
-//                        Text(
-//                            whatsNewText: feature.title
-//                        )
-//                        .font(.subheadline.weight(.semibold))
-//                        .foregroundColor(.primary)
-//                        .fixedSize(horizontal: false, vertical: true)
-//                        Text(
-//                            whatsNewText: feature.subtitle
-//                        )
-//                        .font(.subheadline)
-//                        .foregroundColor(.secondary)
-//                        .fixedSize(horizontal: false, vertical: true)
-//                    }
-//                    .multilineTextAlignment(.leading)
-//                    if self.layout.featureSidewaysAlignment == .leading {
-//                        Spacer()
-//                    }
-//                }
-            case .custom(let custom):
-                if custom.useDefaultStyling {
-                    custom.viewBuilder()
-                        .multilineTextAlignment(.leading)
-                        .environment(\.whatsNewLayout, self.layout)
-                } else {
-                    custom.viewBuilder()
-                }
-            }
-//            if let feature = feature.feature {
-//                
-//            } else if let customViewBuilder = feature.customViewBuilder {
-//                /// Present a custom view
-//                if feature.useDefaultStyling {
-//                    customViewBuilder()
-//                        .multilineTextAlignment(.leading)
-//                        .environment(\.whatsNewLayout, self.layout)
-//                } else {
-//                    customViewBuilder()
-//                }
-//            } else {
-//                /// If there is no feature or custom view
-//                VStack {
-//                    if #available(iOS 17.0, macOS 14.0, *) {
-//                        ContentUnavailableView("Error, there was no onboarding view", image: "exclamationmark.triangle.text.page.fill",
-//                                               description: Text("Contact the developer if this error persists"))
-//                    } else {
-//                        if #available(iOS 14.0, *) {
-//                            Label("Error, there was no onboarding view", systemImage: "exclamationmark.triangle.text.page.fill")
-//                        } else {
-//                            HStack {
-//                                Text("Error, there was no onboarding view")
-//                                Image(systemName: "exclamationmark.triangle.text.page.fill")
-//                            }
-//                        }
-//                        Text("Contact the developer if this error persists")
-//                    }
-//                }
-//                .onAppear {
-//                    print("There was nether a feature, nor a custom view, so this view could not be rendered")
-//                }
-//            }
-        }
-        .accessibilityElement(children: .combine)
-        /*.transition(.asymmetric(
-         insertion: .move(edge: .trailing), // Enters from the right
-         removal: .move(edge: .leading)    // Exits towards the left
-         ))*/
-//        .transition(.slideHorizontally)
-        .frame(maxWidth: .infinity)
-    }
-    
-}
-
-///// Used for custom slide transition
-//extension AnyTransition {
-//    static var slideHorizontally: AnyTransition {
-//#if os(macOS)
-//        .asymmetric(
-//            insertion: .modifier(
-//                active: OffsetModifier(x: NSScreen.main?.frame.width ?? 0),
-//                identity: OffsetModifier(x: 0)
-//            ),
-//            removal: .modifier(
-//                active: OffsetModifier(x: -(NSScreen.main?.frame.width ?? 0)),
-//                identity: OffsetModifier(x: 0)
-//            )
-//        )
-//#else
-//        .asymmetric(
-//            insertion: .modifier(
-//                active: OffsetModifier(x: UIScreen.main.bounds.width),
-//                identity: OffsetModifier(x: 0)
-//            ),
-//            removal: .modifier(
-//                active: OffsetModifier(x: -UIScreen.main.bounds.width),
-//                identity: OffsetModifier(x: 0)
-//            )
-//        )
-//#endif
-//    }
-//}
-
-//struct OffsetModifier: ViewModifier {
-//    let x: CGFloat
-//    func body(content: Content) -> some View {
-//        content.offset(x: x)
-//    }
-//}
 
 // MARK: - Footer
 
@@ -532,16 +399,19 @@ private extension WhatsNewView {
     PreviewViewYay()
 }
 
+@available(iOS 17, macOS 14, *)
 struct PreviewViewYay: View {
     @State var yays = 1
     @State var show = true
     @State var whatsNew: WhatsNew?
+    @State var first: Default?
     var body: some View {
         Text("YAY")
             .onAppear {
+                first = Default(systemName: "richtext.page.ja", title: String(repeating: "Yay", count: yays), subtitle: "TAK \(yays.description)", foregroundStyle: .red)
                 whatsNew = WhatsNew(title: "PPPP", featureGroups: [
                     .init(feature: [
-                        .default(Default(systemName: "richtext.page.ja", title: String(repeating: "Yay", count: yays), subtitle: "TAK", foregroundStyle: .red)),
+                        .default(first ?? Default(systemName: "", title: "Filler", subtitle: "_-_-_")),
                         .default(Default(systemName: "richtext.page.ja", title: "This is a long title that is for testing purposes only", subtitle: "TAKTAKTAKTAKTAKTAKTAKTAKTAKTAK", foregroundStyle: .red)),
                         .default(Default(systemName: "pencil", title: "🍡🍡🍡", subtitle: "", foregroundStyle: .orange)),
                         .default(Default(systemName: "pencil", title: "Yay", subtitle: "", foregroundStyle: .yellow)),
@@ -555,31 +425,40 @@ struct PreviewViewYay: View {
                         .default(Default(systemName: "star", title: "Miku", subtitle: "", foregroundStyle: .pink)),
                         .default(Default(systemName: "pencil", title: "Beam", subtitle: "☆", foregroundStyle: .pink)),
                         .custom(Custom {
-                            mikumikubeam
+                            MikuMikuBeam(yays: $yays)
                         }),
                     ]),
                 ])
             }
-            .sheet(whatsNew: $whatsNew)
+            .onChange(of: yays) {
+                first?.title = String(repeating: "Yay", count: yays)
+            }
+            .sheet(whatsNew: whatsNew)
     #if os(macOS)
             .frame(minWidth: 500, minHeight:  500)
     #endif
     }
-    var mikumikubeam: some View {
+}
+
+struct MikuMikuBeam: View {
+    @Binding var yays: Int
+    var body: some View {
         VStack(alignment: .leading) {
             Text("And now its time for the moment you've been waiting for...1...2...3...Ready? Miku Miku Beam!")
             Button(action: {
                 print("Executing", yays)
                 yays += 1
-                if let wn = whatsNew {
-                    switch wn.featureGroups[0].features[0] {
-                    case .default(var feature):
-                        feature.title = String(repeating: "Yay", count: yays)
-                    case .custom(_):
-                        break
-                    }
-                    whatsNew = wn
-                }
+//                if let wn = whatsNew {
+//                    print("Changing")
+//                    switch wn.featureGroups[0].features[0] {
+//                    case .default(let feature):
+//                        print("Feature")
+//                        feature.title = String(repeating: "Yay", count: yays)
+//                    case .custom(_):
+//                        break
+//                    }
+//                    whatsNew = wn
+//                }
 
             }) {
                 Text("Keep going!")
