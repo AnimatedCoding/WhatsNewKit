@@ -90,7 +90,7 @@ extension WhatsNew.WhatsNewFeature {
     }
 }
 
-typealias Default = WhatsNew.WhatsNewFeature.Default
+public typealias Default = WhatsNew.WhatsNewFeature.Default
 
 extension WhatsNew.WhatsNewFeature {
     
@@ -127,4 +127,4 @@ extension WhatsNew.WhatsNewFeature {
     }
 }
 
-typealias Custom = WhatsNew.WhatsNewFeature.Custom
+public typealias Custom = WhatsNew.WhatsNewFeature.Custom
