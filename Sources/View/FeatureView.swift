@@ -7,7 +7,11 @@ import SwiftUI
 ///   - layout: The `WhatsNew.Layout`
 public struct FeatureView: View {
     
-    @Binding var feature: WhatsNewFeature
+    @Bindable var feature: WhatsNewFeature
+    
+    public init(feature: WhatsNewFeature) {
+        self.feature = feature
+    }
     
     public var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -35,5 +39,5 @@ public struct FeatureView: View {
 public typealias WhatsNewFeature = WhatsNew.WhatsNewFeature.Default
 
 #Preview {
-    FeatureView(feature: .constant(WhatsNewFeature(systemName: "pencil", title: "Title", subtitle: "Subtitle")))
+    FeatureView(feature: (WhatsNewFeature(systemName: "pencil", title: "Title", subtitle: "Subtitle")))
 }

@@ -26,6 +26,14 @@ public struct WhatsNewView: View {
     /// The PresentationMode
     @Environment(\.presentationMode) private var presentationMode
     
+    public init(
+        whatsNew: WhatsNew,
+        layout: WhatsNew.Layout,
+    ) {
+        self.whatsNew = whatsNew
+        self.layout = layout
+    }
+    
     public var body: some View {
         NavigationStack {
             // Content ScrollView
@@ -53,13 +61,8 @@ public struct WhatsNewView: View {
                             ForEach(self.whatsNew.selectedFeature?.features ?? Array<WhatsNew.WhatsNewFeature>(), id: \.id) { feature in
                                 VStack {
                                     switch feature {
-                                    case .default(var feature):
-                                        let bind = Binding<WhatsNewFeature>(get: {
-                                            feature
-                                        }, set: {
-                                            feature = $0
-                                        })
-                                        FeatureView(feature: bind)
+                                    case .default(let feature):
+                                        FeatureView(feature: feature)
                                     case .custom(let custom):
                                         if custom.useDefaultStyling {
                                             custom.viewBuilder()
@@ -200,13 +203,8 @@ public struct WhatsNewView: View {
                             ForEach(self.whatsNew.selectedFeature?.features ?? [], id: \.self) { feature in
                                 VStack {
                                     switch feature {
-                                    case .default(var feature):
-                                        let bind = Binding<WhatsNewFeature>(get: {
-                                            feature
-                                        }, set: {
-                                            feature = $0
-                                        })
-                                        FeatureView(feature: bind)
+                                    case .default(let feature):
+                                        FeatureView(feature: feature)
                                     case .custom(let custom):
                                         if custom.useDefaultStyling {
                                             custom.viewBuilder()
