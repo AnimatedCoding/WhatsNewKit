@@ -16,6 +16,7 @@ public struct FeatureView: View {
     public var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Image(systemName: feature.image)
+                .font(.title)
                 .frame(width: 40)
                 .foregroundStyle(feature.foregroundStyle)
             VStack(
