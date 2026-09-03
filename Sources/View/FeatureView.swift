@@ -14,7 +14,7 @@ public struct FeatureView: View {
     }
     
     public var body: some View {
-        HStack(alignment: .firstTextBaseline) {
+        HStack(alignment: .top) {
             Image(systemName: feature.image)
                 .font(.title)
                 .frame(width: 40)
@@ -22,14 +22,18 @@ public struct FeatureView: View {
             VStack(
                 alignment: .leading,
             ) {
-                Text(feature.title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(.primary)
-                .fixedSize(horizontal: false, vertical: true)
-                Text(feature.subtitle)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+                if !feature.title.isEmpty {
+                    Text(feature.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                if !feature.subtitle.isEmpty {
+                    Text(feature.subtitle)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             .multilineTextAlignment(.leading)
             Spacer()
@@ -40,5 +44,5 @@ public struct FeatureView: View {
 public typealias WhatsNewFeature = WhatsNew.WhatsNewFeature.Default
 
 #Preview {
-    FeatureView(feature: (WhatsNewFeature(systemName: "pencil", title: "Title", subtitle: "Subtitle")))
+    FeatureView(feature: (WhatsNewFeature(systemName: "pencil", title: "", subtitle: "Subtitle")))
 }
