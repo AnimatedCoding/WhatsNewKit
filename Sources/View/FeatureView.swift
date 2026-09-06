@@ -38,6 +38,7 @@ public struct FeatureView: View {
             .multilineTextAlignment(.leading)
             Spacer()
         }
+        .animation(.easeInOut, value: feature)
     }
 }
 

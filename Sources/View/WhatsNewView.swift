@@ -297,10 +297,11 @@ private extension WhatsNewView {
     
     /// The Title View
     var title: some View {
-        Text(self.whatsNew.title)
+        Text(whatsNew.title)
         .font(.largeTitle.bold())
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
+        .animation(.easeInOut, value: whatsNew.title)
     }
     
 }
