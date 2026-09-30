@@ -120,8 +120,6 @@ public struct WhatsNewView: View {
                             self.layout.scrollViewBottomContentInset
                         )
                 }
-                //.padding(.top)
-                //.ignoresSafeArea(edges: .top)
                 .onScrollTargetVisibilityChange(idType: UUID.self, { visible in
                     let newTop = visible.first
                     guard newTop != top else { return }
@@ -288,6 +286,16 @@ public struct WhatsNewView: View {
                 groupIndex = whatsNew.featureGroups.firstIndex(where: { $0 == whatsNew.selectedFeature }) ?? 0
             }
         }
+		.if { view in
+			Group {
+				if #available(anyAppleOS 27, *) {
+					view
+						.scrollEdgeEffectHidden()
+				} else {
+					view
+				}
+			}
+		}
     }
 }
 
@@ -297,14 +305,7 @@ private extension WhatsNewView {
     
     /// The Title View
 	var title: some View {
-		Group {
-			if #available(anyAppleOS 27, *) {
-				Text(whatsNew.title)
-					.scrollEdgeEffectHidden()
-			} else {
-				Text(whatsNew.title)
-			}
-		}
+		Text(whatsNew.title)
 		.font(.largeTitle.bold())
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)

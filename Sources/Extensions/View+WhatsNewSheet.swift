@@ -67,3 +67,12 @@ private struct WhatsNewSheetViewModifier: ViewModifier {
         }
     }
 }
+
+//MARK: -- Conditional modifiers
+
+extension View {
+	@ViewBuilder
+	func `if`<Content: View>(transform: (Self) -> Content) -> some View {
+		transform(self)
+	}
+}
