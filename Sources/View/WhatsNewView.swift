@@ -296,11 +296,19 @@ public struct WhatsNewView: View {
 private extension WhatsNewView {
     
     /// The Title View
-    var title: some View {
-        Text(whatsNew.title)
-        .font(.largeTitle.bold())
+	var title: some View {
+		Group {
+			if #available(anyAppleOS 27, *) {
+				Text(whatsNew.title)
+					.scrollEdgeEffectHidden()
+			} else {
+				Text(whatsNew.title)
+			}
+		}
+		.font(.largeTitle.bold())
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
+		.transition(.opacity)
         .animation(.easeInOut, value: whatsNew.title)
     }
     

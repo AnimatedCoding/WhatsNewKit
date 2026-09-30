@@ -19,6 +19,8 @@ public struct FeatureView: View {
                 .font(.title)
                 .frame(width: 40)
                 .foregroundStyle(feature.foregroundStyle)
+				.transition(.opacity)
+				.animation(.easeInOut, value: feature.image)
             VStack(
                 alignment: .leading,
             ) {
@@ -27,18 +29,21 @@ public struct FeatureView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.primary)
                         .fixedSize(horizontal: false, vertical: true)
+						.transition(.opacity)
+						.animation(.easeInOut, value: feature.title)
                 }
                 if !feature.subtitle.isEmpty {
                     Text(feature.subtitle)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
+						.transition(.opacity)
+						.animation(.easeInOut, value: feature.subtitle)
                 }
             }
             .multilineTextAlignment(.leading)
             Spacer()
         }
-        .animation(.easeInOut, value: feature)
     }
 }
 
