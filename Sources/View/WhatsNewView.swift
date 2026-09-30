@@ -291,7 +291,7 @@ public struct WhatsNewView: View {
 			Group {
 				if #available(anyAppleOS 27, *) {
 					view
-						.scrollEdgeEffectHidden()
+						.scrollEdgeEffectStyle(.soft, for: .top)
 				} else {
 					view
 				}
