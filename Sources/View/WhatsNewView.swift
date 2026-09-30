@@ -286,6 +286,7 @@ public struct WhatsNewView: View {
                 groupIndex = whatsNew.featureGroups.firstIndex(where: { $0 == whatsNew.selectedFeature }) ?? 0
             }
         }
+		// So the title scale effect works
 		.if { view in
 			Group {
 				if #available(anyAppleOS 27, *) {
