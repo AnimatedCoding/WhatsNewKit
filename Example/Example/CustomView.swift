@@ -17,7 +17,7 @@ struct ContentView: View {
             // MARK: -- init for custom view
             .init(customView: {
                 Button(action: {
-                    print("Pressed")
+                    print("Custom view button pressed")
                 }) {
                     Text("This is a custom view")
                 }

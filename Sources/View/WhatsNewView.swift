@@ -174,7 +174,7 @@ public struct WhatsNewView: View {
                 .onChange(of: whatsNew) {
                     switch whatsNew.featureGroups.first?.features.first {
                     case .default(let d):
-                        print(d.title)
+                        print("What'sNewKit - whats new object changed, new title of first feature is:", d.title)
                     default:
                         break
                     }
@@ -351,6 +351,8 @@ private extension WhatsNewView {
                 )
 #endif
                 .foregroundColor(secondaryAction.foregroundColor)
+				.transition(.opacity)
+				.animation(.easeInOut, value: secondaryAction.title)
             }
             // Primary Action Button
             if let primaryAction = self.whatsNew.selectedFeature?.primaryAction {
@@ -371,6 +373,8 @@ private extension WhatsNewView {
 #if os(macOS)
                 .keyboardShortcut(.defaultAction)
 #endif
+				.transition(.opacity)
+				.animation(.easeInOut, value: primaryAction.title)
             } else {
                 Button(action: {}) {
                     Text("Loading")
@@ -378,6 +382,7 @@ private extension WhatsNewView {
 #if os(macOS)
                 .keyboardShortcut(.defaultAction)
 #endif
+				.transition(.opacity)
             }
         }
     }
@@ -455,13 +460,13 @@ struct MikuMikuBeam: View {
         VStack(alignment: .leading) {
             Text("And now its time for the moment you've been waiting for...1...2...3...Ready? Miku Miku Beam!")
             Button(action: {
-                print("Executing", yays)
+                print("What'sNewKit preview - Executing", yays)
                 yays += 1
 //                if let wn = whatsNew {
-//                    print("Changing")
+//                    print("What'sNewKit - Changing")
 //                    switch wn.featureGroups[0].features[0] {
 //                    case .default(let feature):
-//                        print("Feature")
+//                        print("What'sNewKit - Feature")
 //                        feature.title = String(repeating: "Yay", count: yays)
 //                    case .custom(_):
 //                        break

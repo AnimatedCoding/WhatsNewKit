@@ -12,7 +12,7 @@ public extension View {
         let presented = Binding<Bool>(get: {
             return isPresented.wrappedValue && whatsNew != nil
         }, set: {
-            print("setting isPresented")
+			print("What'sNewKit - Setting isPresented from", isPresented.wrappedValue, "to", $0)
             isPresented.wrappedValue = $0
             if $0 { } else {
                 //whatsNew.wrappedValue = nil
